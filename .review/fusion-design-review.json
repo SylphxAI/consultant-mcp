@@ -1,0 +1,30 @@
+{
+  "ok": true,
+  "id": "gen-1781794194-qvNzxqmf5HPp9SREEkL7",
+  "model": "anthropic/claude-4.8-opus-20260528",
+  "latencyMs": 122199,
+  "content": "# Sylphx Consultant MCP — Architecture Verdict\n\n## The two big decisions\n\n**1. Expose four named tools, not one generic `consult(mode=...)`.** This isn't close. Agents route via tool selection, and named tools let you enforce *tight* per-intent schemas. A `mode` enum collapses four genuinely different input/output contracts into one schema full of \"required only if mode==compare\" optionals — exactly what typed validation can't enforce. Your tools have real schema divergence: `review_decision` needs a decision + alternatives + criteria; `compare_options` needs ≥2 options + weighted criteria; `challenge_answer` needs a candidate answer + claim set; `research` needs a question + recency/source scope. Ship these four and **stop**. Resist a fifth until usage data demands it.\n\n**2. Own the fan-out/judge orchestration. Do not depend on OpenRouter Fusion as your panel mechanism.** Treat OpenRouter (and Fusion) as *one provider transport behind an adapter*. Fan-out → judge → synthesize is ~200 lines of orchestration — not your moat, but it *is* your only control point for cost ceilings, timeouts, redaction, partial-failure degradation, and per-model traces. If Fusion owns that, you lose all five and you contradict your own \"future provider adapters\" constraint. A hard dependency there is architecturally incoherent with what you said you want.\n\n**The synthesis: four thin typed tools over one shared consultation engine.** The tools are adapters; the cross-cutting controls live in the engine, enforced once.\n\n```\nMCP tool layer (4 typed tools)  ──►  Consultation Engine\n                                          │\n                    ┌─────────────────────┼──────────────────────┐\n                    ▼                      ▼                       ▼\n            Policy/Privacy           Panel fan-out               Cache\n          (redact, budget,           (N adapters,            (TTL, hashed key)\n           fail-closed)            degrade to N-1)\n                    │                      ▼\n                    ▼               Judge / Synthesis\n            Observability        (configurable judge model,\n          (traces, cost,          surfaces dissent)\n           correlation ID)               │\n                                          ▼\n                              ProviderAdapter interface\n                          ──► [OpenRouter | Anthropic | OpenAI | ...]\n```\n\nBuild *exactly* fan-out → judge → synthesize, and nothing more in 0.x. Don't accidentally build a generic LLM gateway. You're a **consultant, not a proxy**.\n\n---\n\n## Two contract decisions to settle *before* you freeze 0.x\n\nThese leak into caching, observability, and every consumer — get them wrong and you'll break agents on every patch:\n\n- **Judge output shape.** Single verdict + confidence, or ranked panelist outputs + judge meta-commentary? Pick one. Whatever you choose, the judge must **surface disagreement rather than average it into fake consensus** — a low-quorum or split panel should return `insufficient_context`/low-confidence honestly, not a confident-sounding mush.\n- **Research honesty.** If you don't implement web retrieval in beta, the `research` tool must say so. Do not let model parametric knowledge masquerade as sourced research. Lying about provenance is the fastest way to lose agent trust.\n\n---\n\n## The blind spot nobody usually plans for: MCP + long synchronous calls\n\nYour consultations are 20–45s, fan-out, over stdio. This is the part most designs hand-wave. Concretely:\n\n- **Use MCP progress notifications.** The protocol supports `notifications",
+  "usage": {
+    "prompt_tokens": 31266,
+    "completion_tokens": 1645,
+    "total_tokens": 32911,
+    "cost": 0.569261,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.197455,
+      "upstream_inference_prompt_cost": 0.15633000000000002,
+      "upstream_inference_completions_cost": 0.041124999999999995
+    },
+    "server_tool_use": {}
+  }
+}

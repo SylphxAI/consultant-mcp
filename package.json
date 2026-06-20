@@ -1,0 +1,67 @@
+{
+  "name": "@sylphx/consultant-mcp",
+  "version": "0.1.0-beta.0",
+  "description": "Beta MCP server for typed SOTA consultation, model fan-out, and judge synthesis for autonomous agents.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "sylphx-consultant-mcp": "dist/server.js"
+  },
+  "files": [
+    "dist",
+    "docs",
+    "adr",
+    "examples",
+    "README.md",
+    "REPORT.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "build": "tsc -p tsconfig.json && chmod +x dist/server.js",
+    "test": "vitest run src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "pack:beta": "npm pack --dry-run",
+    "clean": "rm -rf dist *.tgz",
+    "verify": "npm run typecheck && npm test && npm run build && npm run pack:beta"
+  },
+  "keywords": [
+    "mcp",
+    "consultant",
+    "agents",
+    "llm",
+    "deliberation",
+    "sylphx"
+  ],
+  "author": "Sylphx",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "dotenv": "^17.4.2",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.4",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SylphxAI/consultant-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SylphxAI/consultant-mcp/issues"
+  },
+  "homepage": "https://github.com/SylphxAI/consultant-mcp#readme",
+  "publishConfig": {
+    "access": "public"
+  }
+}

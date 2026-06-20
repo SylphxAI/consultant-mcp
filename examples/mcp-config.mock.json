@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "sylphx-consultant": {
+      "command": "sylphx-consultant-mcp",
+      "env": {
+        "CONSULTANT_MOCK": "true"
+      }
+    }
+  }
+}
