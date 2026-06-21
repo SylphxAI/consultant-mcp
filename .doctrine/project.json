@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "project": {
+    "repo": "SylphxAI/consultant-mcp",
+    "name": "Sylphx Consultant MCP",
+    "lifecycle": "active",
+    "layer": "tooling",
+    "summary": "Beta MCP server package for typed consultant review, research, answer challenge, and option comparison by autonomous agents.",
+    "goals": [
+      "Provide the @sylphx/consultant-mcp package and sylphx-consultant-mcp stdio binary.",
+      "Own the four typed MCP consultant tool contracts and shared deliberation engine.",
+      "Keep provider fan-out, budget policy, privacy policy, redaction, schemas, docs, tests, and beta package verification coherent."
+    ],
+    "nonGoals": [
+      "Own the future hosted Consultant Service, persistent ledger database, semantic cache, web UI, admin dashboard, or organization approval workflow.",
+      "Own model-vendor operations, enterprise doctrine, or customer-specific prompting policy.",
+      "Own downstream agent product behavior beyond the MCP package contract."
+    ]
+  },
+  "boundaries": {
+    "owns": [
+      {
+        "name": "consultant-mcp-tool-surface",
+        "description": "The stdio MCP server, CLI binary, typed tool schemas, server wiring, and package exports for consultant review, research, challenge, and option comparison."
+      },
+      {
+        "name": "consultant-deliberation-engine",
+        "description": "The shared fan-out, judge synthesis, provider adapter, mock provider, policy, redaction, tests, docs, and beta package verification used by the MCP server."
+      }
+    ],
+    "doesNotOwn": [
+      "Hosted Consultant Service APIs, persistent usage ledgers, async queues, semantic caches, web/admin dashboards, or organization approval workflows.",
+      "Model vendor account operations, customer-specific prompting policy, or downstream agent product behavior.",
+      "Enterprise engineering doctrine and manifest schema owned by SylphxAI/doctrine."
+    ],
+    "publicSurfaces": [
+      {
+        "type": "package-export",
+        "name": "@sylphx/consultant-mcp package export",
+        "location": "package.json"
+      },
+      {
+        "type": "cli",
+        "name": "sylphx-consultant-mcp stdio binary",
+        "location": "package.json"
+      },
+      {
+        "type": "api",
+        "name": "MCP tool schemas and server",
+        "location": "src/schemas.ts and src/server.ts"
+      },
+      {
+        "type": "documentation",
+        "name": "Package README, usage guide, architecture, and beta ADR",
+        "location": "README.md, docs/, and adr/"
+      }
+    ],
+    "allowedDependencies": [
+      {
+        "repo": "SylphxAI/doctrine",
+        "surface": "project manifest schema and engineering doctrine",
+        "direction": "peer-public"
+      }
+    ],
+    "forbiddenCouplings": [
+      "Do not add hosted-service persistence, organization approval workflow, or customer-specific prompt policy to the beta MCP package boundary.",
+      "Do not make downstream agents depend on provider internals instead of the typed MCP tool contract.",
+      "Do not fork doctrine standards into this repository."
+    ]
+  },
+  "documentation": {
+    "adr": {
+      "path": "adr/",
+      "status": "present"
+    },
+    "specs": {
+      "path": "docs/",
+      "status": "present"
+    },
+    "catalog": {
+      "path": ".doctrine/project.json",
+      "status": "present"
+    },
+    "runbooks": {
+      "path": "docs/usage.md",
+      "status": "present"
+    },
+    "generatedReferences": {
+      "path": "src/schemas.ts",
+      "status": "present"
+    }
+  },
+  "delivery": {
+    "ciModel": "none",
+    "requiredContexts": [],
+    "deployPath": "No repo-local GitHub CI workflow is present. Package release is through npm package scripts and future registry publication of the beta package.",
+    "productionProof": "Run npm run verify, inspect npm pack --dry-run output, and read back the package registry/readme after published beta versions.",
+    "recoveryClass": "forward-fix-only"
+  },
+  "adoption": {
+    "status": "baseline",
+    "gaps": [
+      {
+        "id": "repo-ci-workflow-missing",
+        "description": "The repository has package verification scripts but no GitHub PR/merge_group CI workflow recorded at this baseline.",
+        "owner": "SylphxAI/consultant-mcp",
+        "target": "before production lifecycle promotion"
+      },
+      {
+        "id": "release-runbook-missing",
+        "description": "Published beta package versions are forward-only for consumers; add bad-release and registry recovery guidance before full adoption.",
+        "owner": "SylphxAI/consultant-mcp",
+        "target": "before adoption.status becomes full"
+      },
+      {
+        "id": "hosted-service-boundary-deferred",
+        "description": "README intentionally defers hosted Consultant Service capabilities; a future service repo or ADR must own persistence, queues, cache, and admin UI before those features are built.",
+        "owner": "SylphxAI/consultant-mcp",
+        "target": "before hosted Consultant Service implementation"
+      }
+    ]
+  }
+}
