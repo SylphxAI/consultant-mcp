@@ -5,6 +5,7 @@
     "name": "Sylphx Consultant MCP",
     "lifecycle": "active",
     "layer": "tooling",
+    "policyPool": "agent-tool",
     "summary": "Beta MCP server package for typed consultant review, research, answer challenge, and option comparison by autonomous agents.",
     "goals": [
       "Provide the @sylphx/consultant-mcp package and sylphx-consultant-mcp stdio binary.",
@@ -95,7 +96,17 @@
     "requiredContexts": [],
     "deployPath": "No repo-local GitHub CI workflow is present. Package release is through npm package scripts and future registry publication of the beta package.",
     "productionProof": "Run npm run verify, inspect npm pack --dry-run output, and read back the package registry/readme after published beta versions.",
-    "recoveryClass": "forward-fix-only"
+    "recoveryClass": "forward-fix-only",
+    "deployable": false,
+    "packageRelease": {
+      "publishesPackages": true,
+      "ecosystems": ["npm"],
+      "releaseIntent": "Before production publication, npm release intent must use Changesets or a repo-local ADR-59 equivalent for beta package versions.",
+      "versionPr": "Version PRs must be bot or GitHub App-owned, with sylphx-release-bot as the default identity when installed.",
+      "publisher": "Protected GitHub Actions release workflow should publish through OIDC/trusted publishing where supported, with any npm token kept as a bounded fallback.",
+      "requiredContexts": ["release"],
+      "publishProof": "npm registry readback, package README readback, and provenance or attestation evidence for published beta package versions."
+    }
   },
   "adoption": {
     "status": "baseline",
