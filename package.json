@@ -1,6 +1,6 @@
 {
   "name": "@sylphx/consultant-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Beta MCP server for typed SOTA consultation, model fan-out, and judge synthesis for autonomous agents.",
   "type": "module",
   "packageManager": "npm@10.9.8",

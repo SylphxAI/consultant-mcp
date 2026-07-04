@@ -13,11 +13,10 @@
 
 ## Normal release path
 
-1. Add a Changesets release-intent file that describes the package change.
-2. Merge the implementation PR after CI, project-control tests, and GroundAtlas dogfood pass.
-3. Let `.github/workflows/release.yml` create or update the Changesets version PR, or publish an already-versioned bootstrap release.
-4. Merge the version PR only after its CI and release workflow gates pass.
-5. Verify the publish from npm and GitHub release readback.
+1. Commit the intended `package.json` / `package-lock.json` version and `CHANGELOG.md` entry in a release PR. A Changesets file may be used as the authoring format, but the version/changelog diff must be materialized before merge.
+2. Merge the release PR only after CI, project-control tests, and GroundAtlas dogfood pass.
+3. Let `.github/workflows/release.yml` publish the already-versioned package from `main`.
+4. Verify the publish from npm, install smoke, tag readback, and GitHub release readback.
 
 The release workflow runs on GitHub-hosted runners because npm provenance currently rejects self-hosted GitHub Actions provenance bundles. PR/main CI still runs on the normal Sylphx runner pool. npm registry readback for a newly created scoped package can lag the successful publish response; the workflow retries readback before tag/release creation instead of treating first-read E404 as final truth.
 
@@ -47,6 +46,6 @@ A timeout exit code is acceptable for the stdio MCP server smoke because a healt
 Published npm versions are immutable public contracts. If a bad version reaches npm:
 
 1. Do not delete history or rewrite tags.
-2. Open a forward-fix PR with a new Changesets patch or prerelease version.
+2. Open a forward-fix PR with a new patch or prerelease version plus changelog entry.
 3. If the published package is dangerous, deprecate the affected version with a clear replacement version after the fix is available.
 4. Record the release workflow run, npm readback, and recovery PR in the issue or ADR that owns the incident.

@@ -38,7 +38,7 @@ test('Doctrine adapter remains Sylphx-specific and package publication boundary 
   assert.equal(doctrine.delivery.ciModel, 'adr29-admission-with-groundatlas-and-protected-npm-release')
   assert.ok(doctrine.delivery.productionProof.includes('GroundAtlas package dogfood'))
   assert.ok(doctrine.delivery.productionProof.includes('protected release workflow evidence'))
-  assert.ok(doctrine.delivery.packageRelease.releaseIntent.includes('Changesets'))
+  assert.ok(doctrine.delivery.packageRelease.releaseIntent.includes('already-versioned PR'))
   assert.ok(doctrine.delivery.packageRelease.publisher.includes('npm publish --provenance'))
   assert.ok(!doctrine.adoption.gaps.some((gap) => gap.id === 'package-publish-workflow-missing'))
 })
