@@ -7,3 +7,6 @@ artifacts/
 .DS_Store
 coverage/
 .vitest/
+
+# Generated project-control evidence
+.groundatlas*/
