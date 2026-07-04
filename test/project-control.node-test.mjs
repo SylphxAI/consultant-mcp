@@ -89,6 +89,8 @@ test('release workflow uses protected Sylphx npm publication path', () => {
   assert.ok(workflow.includes('npm exec --yes --package groundatlas@0.1.2 -- ga update --out .groundatlas-pilot'))
   assert.ok(workflow.includes('npm exec --yes --package groundatlas@0.1.2 -- ga audit --out .groundatlas-pilot'))
   assert.ok(workflow.includes('npm publish --access public --provenance'))
+  assert.ok(workflow.includes('npm registry readback attempt'))
+  assert.ok(workflow.includes('seq 1 40'))
   assert.ok(workflow.includes('npm view'))
   assert.ok(workflow.includes('sylphx-consultant-mcp'))
   assert.ok(workflow.includes('gh release create'))
