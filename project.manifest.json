@@ -1,0 +1,130 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SylphxAI/groundatlas/main/schemas/project.manifest.schema.json",
+  "schemaVersion": 1,
+  "project": {
+    "id": "consultant-mcp",
+    "name": "Sylphx Consultant MCP",
+    "summary": "Beta MCP stdio server package for typed consultant review, research synthesis, answer challenge, and option comparison by autonomous agents.",
+    "lifecycle": "active",
+    "visibility": "open-source",
+    "repository": "https://github.com/SylphxAI/consultant-mcp",
+    "homepage": "https://github.com/SylphxAI/consultant-mcp#readme",
+    "tags": [
+      "mcp",
+      "consultant",
+      "agents",
+      "typescript",
+      "tooling",
+      "beta-package"
+    ]
+  },
+  "truth": {
+    "humanProjectFile": "PROJECT.md",
+    "agentAdapter": "AGENTS.md",
+    "specs": [
+      "README.md",
+      "docs/architecture.md",
+      "docs/usage.md",
+      "docs/specs/project-control-gate.md"
+    ],
+    "adrs": [
+      "docs/adr/ADR-DRAFT-groundatlas-project-control-gate.md",
+      "docs/adr/0001-consultant-mcp-beta-tool-surface.md"
+    ],
+    "source": [
+      "src/",
+      "package.json",
+      "package-lock.json",
+      "tsconfig.json",
+      ".github/workflows/ci.yml"
+    ],
+    "tests": [
+      "src/__tests__/",
+      "test/project-control.node-test.mjs",
+      ".github/workflows/ci.yml"
+    ],
+    "runbooks": [
+      "README.md",
+      "PROJECT.md",
+      "AGENTS.md",
+      "docs/usage.md",
+      "SECURITY.md"
+    ]
+  },
+  "surfaces": [
+    {
+      "type": "package",
+      "name": "@sylphx/consultant-mcp package",
+      "path": "package.json",
+      "description": "Public npm package metadata, export map, files, and beta package version."
+    },
+    {
+      "type": "cli",
+      "name": "sylphx-consultant-mcp",
+      "path": "package.json",
+      "description": "Stdio MCP server binary declared through the package bin field."
+    },
+    {
+      "type": "api",
+      "name": "Typed MCP tool schemas and server",
+      "path": "src/schemas.ts",
+      "description": "Product contract for review, research, challenge, and option-comparison tools."
+    },
+    {
+      "type": "api",
+      "name": "MCP server entry point",
+      "path": "src/server.ts",
+      "description": "Stdio server implementation that exposes the typed consultant tools."
+    },
+    {
+      "type": "docs",
+      "name": "Repository README",
+      "path": "README.md",
+      "description": "Beta status, tool overview, configuration, safety model, and project-control entry point."
+    },
+    {
+      "type": "docs",
+      "name": "Architecture and usage docs",
+      "path": "docs/",
+      "description": "Architecture, usage, ADRs, and project-control specs for local beta package consumers."
+    },
+    {
+      "type": "workflow",
+      "name": "CI/admission",
+      "path": ".github/workflows/ci.yml",
+      "description": "ADR-29 admission, npm package verification, project-control tests, and GroundAtlas package dogfood."
+    },
+    {
+      "type": "docs",
+      "name": "Doctrine adapter manifest",
+      "path": ".doctrine/project.json",
+      "description": "Sylphx Doctrine adapter and org-local governance catalog; not the vendor-neutral GroundAtlas default."
+    }
+  ],
+  "commands": [
+    {
+      "name": "install",
+      "command": "npm ci",
+      "purpose": "Install locked npm dependencies without lockfile drift."
+    },
+    {
+      "name": "verify",
+      "command": "npm run verify",
+      "purpose": "Run typecheck, tests, build, and dry-run npm package verification."
+    },
+    {
+      "name": "test:project-control",
+      "command": "npm run test:project-control",
+      "purpose": "Verify neutral manifest, Doctrine adapter, CI gate, and package-publication boundary."
+    },
+    {
+      "name": "groundatlas:fleet",
+      "command": "npm run groundatlas:fleet",
+      "purpose": "Prove the vendor-neutral manifest is selected and generated GroundAtlas files are navigation-only."
+    }
+  ],
+  "adoption": {
+    "status": "adopted",
+    "notes": "Vendor-neutral GroundAtlas manifest for package/action dogfooding. .doctrine/project.json remains the Sylphx Doctrine adapter and local governance catalog. Generated .groundatlas* reports are evidence/navigation only, not source of truth. The beta package is not published to npm yet; publication requires a separate release workflow/Changesets decision and registry readback."
+  }
+}

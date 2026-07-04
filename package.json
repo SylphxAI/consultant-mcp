@@ -17,7 +17,6 @@
   "files": [
     "dist",
     "docs",
-    "adr",
     "examples",
     "README.md",
     "REPORT.md",
@@ -30,7 +29,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "pack:beta": "npm pack --dry-run",
     "clean": "rm -rf dist *.tgz",
-    "verify": "npm run typecheck && npm test && npm run build && npm run pack:beta"
+    "verify": "npm run typecheck && npm test && npm run build && npm run pack:beta",
+    "test:project-control": "node --test test/project-control.node-test.mjs",
+    "groundatlas:fleet": "npm exec --yes --package groundatlas@0.1.2 -- ga fleet . --out .groundatlas-pilot --require-atlas --strict --json"
   },
   "keywords": [
     "mcp",

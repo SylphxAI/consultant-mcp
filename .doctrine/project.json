@@ -53,7 +53,32 @@
       {
         "type": "documentation",
         "name": "Package README, usage guide, architecture, and beta ADR",
-        "location": "README.md, docs/, and adr/"
+        "location": "README.md, docs/, docs/adr/, and docs/specs/"
+      },
+      {
+        "type": "manifest",
+        "name": "Vendor-neutral project manifest",
+        "location": "project.manifest.json"
+      },
+      {
+        "type": "workflow",
+        "name": "CI/admission and GroundAtlas dogfood",
+        "location": ".github/workflows/ci.yml"
+      },
+      {
+        "type": "test",
+        "name": "Project-control boundary test",
+        "location": "test/project-control.node-test.mjs"
+      },
+      {
+        "type": "documentation",
+        "name": "Project-control spec",
+        "location": "docs/specs/project-control-gate.md"
+      },
+      {
+        "type": "documentation",
+        "name": "Security policy",
+        "location": "SECURITY.md"
       }
     ],
     "allowedDependencies": [
@@ -61,6 +86,21 @@
         "repo": "SylphxAI/doctrine",
         "surface": "project manifest schema and engineering doctrine",
         "direction": "peer-public"
+      },
+      {
+        "repo": "SylphxAI/.github",
+        "surface": "ADR-29 reusable admission action and future shared release workflow contracts.",
+        "direction": "peer-public"
+      },
+      {
+        "repo": "SylphxAI/groundatlas",
+        "surface": "GroundAtlas GitHub Action, npm package, schemas, and generated evidence reports.",
+        "direction": "peer-public"
+      },
+      {
+        "repo": "actions/setup-node",
+        "surface": "GitHub Action for Node.js setup used by npm verification and GroundAtlas package execution.",
+        "direction": "external"
       }
     ],
     "forbiddenCouplings": [
@@ -71,51 +111,61 @@
   },
   "documentation": {
     "adr": {
-      "path": "adr/",
+      "path": "docs/adr/",
       "status": "present"
     },
     "specs": {
-      "path": "docs/",
+      "path": "README.md, docs/, and docs/specs/",
       "status": "present"
     },
     "catalog": {
-      "path": ".doctrine/project.json",
+      "path": "PROJECT.md and project.manifest.json",
       "status": "present"
     },
     "runbooks": {
-      "path": "docs/usage.md",
+      "path": "AGENTS.md, docs/usage.md, and SECURITY.md",
       "status": "present"
     },
     "generatedReferences": {
-      "path": "src/schemas.ts",
-      "status": "present"
+      "path": "src/schemas.ts and dist/",
+      "status": "source-and-generated"
     }
   },
   "delivery": {
-    "ciModel": "none",
-    "requiredContexts": [],
-    "deployPath": "No repo-local GitHub CI workflow is present. Package release is through npm package scripts and future registry publication of the beta package.",
-    "productionProof": "Run npm run verify, inspect npm pack --dry-run output, and read back the package registry/readme after published beta versions.",
+    "ciModel": "adr29-admission-with-groundatlas",
+    "requiredContexts": [
+      "risk-classification/pass",
+      "ci",
+      "trunk-admission/pass"
+    ],
+    "deployPath": "Pull requests and merge groups run .github/workflows/ci.yml with ADR-29 admission contexts, npm run verify, project-control boundary tests, and GroundAtlas package dogfood. Main pushes run the same CI/postsubmit proof. No release workflow is enabled yet; beta package publication remains a separate release-control decision.",
+    "productionProof": "npm run verify, project-control boundary tests, GroundAtlas package dogfood, PR/merge-group/main CI evidence, dry-run package contents, and npm registry/readme readback only after a future publish workflow publishes a beta version.",
     "recoveryClass": "forward-fix-only",
     "deployable": false,
     "packageRelease": {
       "publishesPackages": true,
-      "ecosystems": ["npm"],
-      "releaseIntent": "Before production publication, npm release intent must use Changesets or a repo-local ADR-59 equivalent for beta package versions.",
+      "ecosystems": [
+        "npm"
+      ],
+      "releaseIntent": "Before public beta publication, npm release intent must use Changesets or a repo-local ADR-59 equivalent and a protected GitHub Actions release workflow.",
       "versionPr": "Version PRs must be bot or GitHub App-owned, with sylphx-release-bot as the default identity when installed.",
-      "publisher": "Protected GitHub Actions release workflow should publish through OIDC/trusted publishing where supported, with any npm token kept as a bounded fallback.",
-      "requiredContexts": ["release"],
-      "publishProof": "npm registry readback, package README readback, and provenance or attestation evidence for published beta package versions."
+      "publisher": "No repo-local publisher is enabled in this slice. A future protected GitHub Actions release workflow should publish through OIDC/trusted publishing where supported, with any npm token kept as a bounded fallback.",
+      "requiredContexts": [
+        "risk-classification/pass",
+        "ci",
+        "trunk-admission/pass"
+      ],
+      "publishProof": "npm registry readback, package README readback, release workflow evidence, and provenance or attestation evidence for published beta package versions."
     }
   },
   "adoption": {
-    "status": "baseline",
+    "status": "adopted",
     "gaps": [
       {
-        "id": "repo-ci-workflow-missing",
-        "description": "The repository has package verification scripts but no GitHub PR/merge_group CI workflow recorded at this baseline.",
+        "id": "package-publish-workflow-missing",
+        "description": "The beta package metadata exists but @sylphx/consultant-mcp is not yet published to npm; publication needs a dedicated release workflow/Changesets decision and registry readback before claiming package-publication done.",
         "owner": "SylphxAI/consultant-mcp",
-        "target": "before production lifecycle promotion"
+        "target": "before public beta publication"
       },
       {
         "id": "release-runbook-missing",
@@ -128,6 +178,12 @@
         "description": "README intentionally defers hosted Consultant Service capabilities; a future service repo or ADR must own persistence, queues, cache, and admin UI before those features are built.",
         "owner": "SylphxAI/consultant-mcp",
         "target": "before hosted Consultant Service implementation"
+      },
+      {
+        "id": "groundatlas-fleet-ruleset",
+        "description": "Organization-wide mandatory GroundAtlas enforcement belongs in the owning fleet control plane, not this beta MCP package.",
+        "owner": "SylphxAI/groundatlas",
+        "target": "fleet control-plane rollout"
       }
     ]
   }

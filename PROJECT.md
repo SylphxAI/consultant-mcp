@@ -8,7 +8,8 @@ consultant review, research synthesis, answer challenge, and option comparison.
 
 - State: `active`
 - Layer: `tooling`
-- Machine manifest: [`.doctrine/project.json`](./.doctrine/project.json)
+- Vendor-neutral project manifest: [`project.manifest.json`](./project.manifest.json)
+- Sylphx Doctrine adapter: [`.doctrine/project.json`](./.doctrine/project.json)
 
 ## Goals
 
@@ -43,12 +44,9 @@ ADR changes the lifecycle and boundary.
 - CLI binary: `sylphx-consultant-mcp`
 - MCP tool schemas and server: `src/schemas.ts`, `src/server.ts`
 - Provider adapter boundary: `src/providers/`
-- Documentation and ADRs: `README.md`, `docs/`, `adr/`
+- Documentation and ADRs: `README.md`, `docs/`, `docs/adr/`, and `docs/specs/`
+- CI/admission and GroundAtlas dogfood: `.github/workflows/ci.yml`
 
 ## Delivery
 
-This repo currently has package scripts but no repo-local GitHub CI workflow.
-Production proof for package changes is `npm run verify`, dry-run package
-verification, and package registry/readme readback for published beta versions.
-Published package mistakes are recovered with forward fixes or replacement
-versions.
+Pull requests, merge groups, and main pushes run `.github/workflows/ci.yml`, including ADR-29 admission contexts, `npm run verify`, project-control boundary tests, and GroundAtlas package dogfooding. Production proof for package changes is `npm run verify`, dry-run package verification, CI evidence, and package registry/readme readback only after a future protected release workflow publishes beta versions. Published package mistakes are recovered with forward fixes or replacement versions. Generated `.groundatlas*` reports are evidence/navigation only, not source of truth.
