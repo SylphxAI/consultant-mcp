@@ -25,7 +25,9 @@
       "README.md",
       "docs/architecture.md",
       "docs/usage.md",
-      "docs/specs/project-control-gate.md"
+      "docs/specs/project-control-gate.md",
+      "docs/runbooks/release.md",
+      "CHANGELOG.md"
     ],
     "adrs": [
       "docs/adr/ADR-3-groundatlas-project-control-gate.md",
@@ -36,19 +38,24 @@
       "package.json",
       "package-lock.json",
       "tsconfig.json",
-      ".github/workflows/ci.yml"
+      ".github/workflows/ci.yml",
+      ".github/workflows/release.yml",
+      ".changeset/config.json",
+      "CHANGELOG.md"
     ],
     "tests": [
       "src/__tests__/",
       "test/project-control.node-test.mjs",
-      ".github/workflows/ci.yml"
+      ".github/workflows/ci.yml",
+      ".github/workflows/release.yml"
     ],
     "runbooks": [
       "README.md",
       "PROJECT.md",
       "AGENTS.md",
       "docs/usage.md",
-      "SECURITY.md"
+      "SECURITY.md",
+      "docs/runbooks/release.md"
     ]
   },
   "surfaces": [
@@ -99,6 +106,18 @@
       "name": "Doctrine adapter manifest",
       "path": ".doctrine/project.json",
       "description": "Sylphx Doctrine adapter and org-local governance catalog; not the vendor-neutral GroundAtlas default."
+    },
+    {
+      "type": "workflow",
+      "name": "Release/publish",
+      "path": ".github/workflows/release.yml",
+      "description": "Protected Changesets npm release workflow using the shared Sylphx publisher and package provenance settings."
+    },
+    {
+      "type": "docs",
+      "name": "Release runbook",
+      "path": "docs/runbooks/release.md",
+      "description": "Operational proof and recovery procedure for public npm package releases."
     }
   ],
   "commands": [
@@ -121,10 +140,15 @@
       "name": "groundatlas:fleet",
       "command": "npm run groundatlas:fleet",
       "purpose": "Prove the vendor-neutral manifest is selected and generated GroundAtlas files are navigation-only."
+    },
+    {
+      "name": "release:readback",
+      "command": "npm view @sylphx/consultant-mcp version dist-tags time gitHead dist.integrity --json",
+      "purpose": "Read back the public npm package version, integrity, and publish metadata after protected release workflow completion."
     }
   ],
   "adoption": {
     "status": "adopted",
-    "notes": "Vendor-neutral GroundAtlas manifest for package/action dogfooding. .doctrine/project.json remains the Sylphx Doctrine adapter and local governance catalog. Generated .groundatlas* reports are evidence/navigation only, not source of truth. The beta package is not published to npm yet; publication requires a separate release workflow/Changesets decision and registry readback."
+    "notes": "Vendor-neutral GroundAtlas manifest for package/action dogfooding. .doctrine/project.json remains the Sylphx Doctrine adapter and local governance catalog. Generated .groundatlas* reports are evidence/navigation only, not source of truth. Public npm release is controlled by Changesets plus the protected Sylphx release workflow; publication is only complete after registry and GitHub release readback."
   }
 }

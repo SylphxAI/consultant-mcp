@@ -17,6 +17,7 @@ Useful validation for this package:
 - `npm run verify`
 - `npm run test:project-control`
 - `npm run groundatlas:fleet`
+- release readback commands in `docs/runbooks/release.md` after any public package publish
 
 Do not add hosted-service persistence, admin UI, organization approval workflow,
 or customer-specific prompting policy to this beta MCP package without first

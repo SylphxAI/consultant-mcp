@@ -1,9 +1,16 @@
 # Consultant MCP Usage
 
-## Install from a local beta tarball
+## Install from npm
 
 ```bash
-npm install -g ./sylphx-consultant-mcp-0.1.0-beta.0.tgz
+npm install -g @sylphx/consultant-mcp
+```
+
+## Install from a local verification tarball
+
+```bash
+npm pack
+npm install -g ./sylphx-consultant-mcp-*.tgz
 ```
 
 ## Run in mock mode

@@ -1,0 +1,22 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  release:
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: write
+      id-token: write
+    uses: SylphxAI/.github/.github/workflows/release.yml@main
+    with:
+      build: npm run verify
+      prepublish: |
+        npm run test:project-control
+        npm exec --yes --package groundatlas@0.1.2 -- ga update --out .groundatlas-pilot
+        npm exec --yes --package groundatlas@0.1.2 -- ga audit --out .groundatlas-pilot
+        npm run --silent groundatlas:fleet
+    secrets: inherit
