@@ -28,7 +28,7 @@
       "docs/specs/project-control-gate.md"
     ],
     "adrs": [
-      "docs/adr/ADR-DRAFT-groundatlas-project-control-gate.md",
+      "docs/adr/ADR-3-groundatlas-project-control-gate.md",
       "docs/adr/0001-consultant-mcp-beta-tool-surface.md"
     ],
     "source": [

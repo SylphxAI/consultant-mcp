@@ -1,9 +1,9 @@
 ---
-status: draft
+status: accepted
 slug: groundatlas-project-control-gate
 ---
 
-# ADR-DRAFT: GroundAtlas Project Control Gate
+# ADR-3: GroundAtlas Project Control Gate
 
 ## Context
 
