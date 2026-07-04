@@ -149,6 +149,6 @@
   ],
   "adoption": {
     "status": "adopted",
-    "notes": "Vendor-neutral GroundAtlas manifest for package/action dogfooding. .doctrine/project.json remains the Sylphx Doctrine adapter and local governance catalog. Generated .groundatlas* reports are evidence/navigation only, not source of truth. Public npm release is controlled by Changesets release intent plus the protected GitHub-hosted release workflow; publication is only complete after npm registry, install-smoke, and GitHub release readback."
+    "notes": "Vendor-neutral GroundAtlas manifest for package/action dogfooding. .doctrine/project.json remains the Sylphx Doctrine adapter and local governance catalog. Generated .groundatlas* reports are evidence/navigation only, not source of truth. Public npm release is controlled by an already-versioned release PR plus the protected GitHub-hosted release workflow; publication is only complete after npm registry, install-smoke, and GitHub release readback."
   }
 }
