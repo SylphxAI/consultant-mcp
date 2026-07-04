@@ -23,4 +23,4 @@ Do not add hosted-service persistence, admin UI, organization approval workflow,
 or customer-specific prompting policy to this beta MCP package without first
 updating the project boundary through an ADR or manifest change.
 
-Generated `.groundatlas*` reports are evidence/navigation only. Do not treat them as source of truth.
+Generated `.groundatlas*` files plus GroundAtlas JSON/Markdown reports are evidence/navigation only. Do not treat them as source of truth.

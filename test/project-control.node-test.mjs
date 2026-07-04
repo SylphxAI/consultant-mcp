@@ -49,10 +49,12 @@ test('CI verifies the package and dogfoods the released GroundAtlas package/acti
   assert.ok(workflow.includes('npm ci'))
   assert.ok(workflow.includes('npm run verify'))
   assert.ok(workflow.includes('npm run test:project-control'))
-  assert.ok(workflow.includes('uses: SylphxAI/groundatlas@v0.1.2'))
-  assert.ok(workflow.includes('package-spec: groundatlas@0.1.2'))
+  assert.ok(workflow.includes('uses: SylphxAI/groundatlas@v0.1.3'))
+  assert.ok(workflow.includes('package-spec: groundatlas@0.1.3'))
   assert.ok(workflow.includes('require-atlas: "true"'))
   assert.ok(workflow.includes('strict: "true"'))
+  assert.ok(workflow.includes('fleet-markdown-report-path'))
+  assert.ok(workflow.includes('Summary: 1 adopted, 0 warning, 0 blocked, 1 total.'))
   assert.ok(workflow.includes('project.manifest.json'))
   assert.ok(workflow.includes('.doctrine/project.json'))
 })
@@ -64,7 +66,7 @@ test('package scripts expose reproducible local gates and protected publication 
   assert.equal(pkg.scripts['test:project-control'], 'node --test test/project-control.node-test.mjs')
   assert.equal(
     pkg.scripts['groundatlas:fleet'],
-    'npm exec --yes --package groundatlas@0.1.2 -- ga fleet . --out .groundatlas-pilot --require-atlas --strict --json'
+    'npm exec --yes --package groundatlas@0.1.3 -- ga fleet . --out .groundatlas-pilot --require-atlas --strict --json'
   )
   assert.equal(pkg.scripts['changeset:publish'], undefined)
   assert.match(pkg.packageManager, /^npm@/)
@@ -86,8 +88,10 @@ test('release workflow uses protected Sylphx npm publication path', () => {
   assert.ok(workflow.includes('npm install --global npm@^11.5.1'))
   assert.ok(workflow.includes('npm run verify'))
   assert.ok(workflow.includes('npm run test:project-control'))
-  assert.ok(workflow.includes('npm exec --yes --package groundatlas@0.1.2 -- ga update --out .groundatlas-pilot'))
-  assert.ok(workflow.includes('npm exec --yes --package groundatlas@0.1.2 -- ga audit --out .groundatlas-pilot'))
+  assert.ok(workflow.includes('npm exec --yes --package groundatlas@0.1.3 -- ga update --out .groundatlas-pilot'))
+  assert.ok(workflow.includes('npm exec --yes --package groundatlas@0.1.3 -- ga manifest --out .groundatlas-pilot --json'))
+  assert.ok(workflow.includes('npm exec --yes --package groundatlas@0.1.3 -- ga audit --out .groundatlas-pilot'))
+  assert.ok(workflow.includes('groundatlas-release-fleet.md'))
   assert.ok(workflow.includes('npm publish --access public --provenance'))
   assert.ok(workflow.includes('npm registry readback attempt'))
   assert.ok(workflow.includes('seq 1 40'))
