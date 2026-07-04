@@ -13,10 +13,9 @@ jobs:
       id-token: write
     uses: SylphxAI/.github/.github/workflows/release.yml@main
     with:
-      build: npm run verify
+      build: bun run typecheck && bun test src && bun run build && bun pm pack --dry-run
       prepublish: |
-        npm run test:project-control
-        npm exec --yes --package groundatlas@0.1.2 -- ga update --out .groundatlas-pilot
-        npm exec --yes --package groundatlas@0.1.2 -- ga audit --out .groundatlas-pilot
-        npm run --silent groundatlas:fleet
+        bunx --bun --package groundatlas@0.1.2 ga update --out .groundatlas-pilot
+        bunx --bun --package groundatlas@0.1.2 ga audit --out .groundatlas-pilot
+        bunx --bun --package groundatlas@0.1.2 ga fleet . --out .groundatlas-pilot --require-atlas --strict --json
     secrets: inherit
