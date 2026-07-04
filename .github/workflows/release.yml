@@ -4,18 +4,142 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: write
+  id-token: write
+
 jobs:
-  release:
-    permissions:
-      actions: write
-      contents: write
-      pull-requests: write
-      id-token: write
-    uses: SylphxAI/.github/.github/workflows/release.yml@main
-    with:
-      build: bun run typecheck && bun test src && bun run build && bun pm pack --dry-run
-      prepublish: |
-        bunx --bun --package groundatlas@0.1.2 ga update --out .groundatlas-pilot
-        bunx --bun --package groundatlas@0.1.2 ga audit --out .groundatlas-pilot
-        bunx --bun --package groundatlas@0.1.2 ga fleet . --out .groundatlas-pilot --require-atlas --strict --json
-    secrets: inherit
+  publish:
+    name: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js for npm registry
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22.14.0"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Ensure npm supports provenance
+        run: |
+          npm install --global npm@^11.5.1
+          npm --version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify package
+        run: npm run verify
+
+      - name: Test project-control boundary
+        run: npm run test:project-control
+
+      - name: GroundAtlas release dogfood
+        run: |
+          npm exec --yes --package groundatlas@0.1.2 -- ga update --out .groundatlas-pilot
+          npm exec --yes --package groundatlas@0.1.2 -- ga audit --out .groundatlas-pilot
+          npm exec --yes --package groundatlas@0.1.2 -- ga fleet . --out .groundatlas-pilot --require-atlas --strict --json | tee "$RUNNER_TEMP/groundatlas-release-fleet.json"
+          node -e "const r=require(process.env.RUNNER_TEMP + '/groundatlas-release-fleet.json'); if (r.summary.adopted !== 1 || r.summary.blocked !== 0 || r.summary.warning !== 0) throw new Error('GroundAtlas release fleet gate failed')"
+
+      - name: Resolve package release state
+        id: pkg
+        shell: bash
+        run: |
+          set -euo pipefail
+          name=$(node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).name")
+          version=$(node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).version")
+          tag="v${version}"
+          echo "name=${name}" >> "$GITHUB_OUTPUT"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+
+          if npm view "${name}@${version}" version --json >/tmp/npm-version.json 2>/tmp/npm-view.err; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            cat /tmp/npm-version.json
+          else
+            if grep -E "E404|404 Not Found|not found" /tmp/npm-view.err >/dev/null; then
+              echo "publish=true" >> "$GITHUB_OUTPUT"
+              cat /tmp/npm-view.err
+            else
+              cat /tmp/npm-view.err
+              exit 1
+            fi
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
+            echo "tag_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to npm with provenance
+        if: steps.pkg.outputs.publish == 'true'
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Registry readback
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm view "${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}" version dist-tags time gitHead dist.integrity dist.attestations --json | tee "$RUNNER_TEMP/npm-readback.json"
+          node -e "const r=require(process.env.RUNNER_TEMP + '/npm-readback.json'); if (r.version !== '${{ steps.pkg.outputs.version }}') throw new Error('npm readback version mismatch')"
+
+      - name: Smoke installed package
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          npm install --prefix "$tmp" "${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}"
+          set +e
+          CONSULTANT_MOCK=true timeout 5s "$tmp/node_modules/.bin/sylphx-consultant-mcp"
+          status=$?
+          set -e
+          rm -rf "$tmp"
+          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
+            echo "Unexpected smoke exit code: $status" >&2
+            exit "$status"
+          fi
+
+      - name: Create release tag
+        if: steps.pkg.outputs.tag_exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.pkg.outputs.tag }}" "${GITHUB_SHA}"
+          git push origin "refs/tags/${{ steps.pkg.outputs.tag }}"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "${{ steps.pkg.outputs.tag }}" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release view "${{ steps.pkg.outputs.tag }}" --repo "$GITHUB_REPOSITORY" --json tagName,publishedAt,url
+          else
+            gh release create "${{ steps.pkg.outputs.tag }}" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "${{ steps.pkg.outputs.name }} ${{ steps.pkg.outputs.tag }}" \
+              --notes "Published ${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }} to npm through protected GitHub Actions release workflow with npm provenance."
+          fi
+
+      - name: GitHub release readback
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release view "${{ steps.pkg.outputs.tag }}" --repo "$GITHUB_REPOSITORY" --json tagName,publishedAt,url,assets | tee "$RUNNER_TEMP/github-release-readback.json"
+
+      - name: Upload release evidence
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: consultant-mcp-release-evidence
+          path: |
+            ${{ runner.temp }}/groundatlas-release-fleet.json
+            ${{ runner.temp }}/npm-readback.json
+            ${{ runner.temp }}/github-release-readback.json
+          if-no-files-found: warn

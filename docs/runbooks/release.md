@@ -1,6 +1,6 @@
 # Release Runbook
 
-`@sylphx/consultant-mcp` publishes through the shared Sylphx npm release workflow. Do not publish this package manually from a laptop.
+`@sylphx/consultant-mcp` publishes through `.github/workflows/release.yml`, a protected GitHub Actions workflow that uses the organization `NPM_TOKEN`, GitHub-hosted OIDC, and `npm publish --provenance`. Do not publish this package manually from a laptop.
 
 ## Source of truth
 
@@ -19,7 +19,7 @@
 4. Merge the version PR only after its CI and release workflow gates pass.
 5. Verify the publish from npm and GitHub release readback.
 
-The reusable release workflow installs Bun before its first validation step and sets up Node/npm immediately before registry publish. Release-workflow validation therefore uses Bun-native commands before publish, while PR/main CI remains the npm-locked package gate.
+The release workflow runs on GitHub-hosted runners because npm provenance currently rejects self-hosted GitHub Actions provenance bundles. PR/main CI still runs on the normal Sylphx runner pool.
 
 ## Required publish proof
 
