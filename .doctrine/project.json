@@ -138,8 +138,8 @@
       "ci",
       "trunk-admission/pass"
     ],
-    "deployPath": "Pull requests and merge groups run .github/workflows/ci.yml with ADR-29 admission contexts, npm run verify, project-control boundary tests, and GroundAtlas package dogfood. Main pushes run CI/postsubmit proof plus .github/workflows/release.yml, which uses Changesets release intent and the shared Sylphx npm publisher for public package releases.",
-    "productionProof": "npm run verify, project-control boundary tests, GroundAtlas package dogfood, PR/merge-group/main CI evidence, dry-run package contents, protected release workflow evidence, npm registry/readback including integrity and attestations when present, and GitHub release readback.",
+    "deployPath": "Pull requests and merge groups run .github/workflows/ci.yml with ADR-29 admission contexts, npm run verify, project-control boundary tests, and GroundAtlas package dogfood. Main pushes run CI/postsubmit proof plus .github/workflows/release.yml, which uses GitHub-hosted Actions, organization NPM_TOKEN, npm provenance publish, install smoke, npm registry readback, tag creation, and GitHub release readback for public package releases.",
+    "productionProof": "npm run verify, project-control boundary tests, GroundAtlas package dogfood, PR/merge-group/main CI evidence, dry-run package contents, protected release workflow evidence, npm registry/readback including integrity and attestations, install smoke, and GitHub release readback.",
     "recoveryClass": "forward-fix-only",
     "deployable": false,
     "packageRelease": {
@@ -149,13 +149,13 @@
       ],
       "releaseIntent": "Public package release intent uses Changesets files under .changeset/ and protected GitHub Actions release automation.",
       "versionPr": "Changesets version PRs are the default package-version path after release workflow adoption; bootstrap release-enablement PRs must carry explicit release intent and pass the same gates.",
-      "publisher": ".github/workflows/release.yml delegates to SylphxAI/.github reusable release/publish-npm workflows with inherited organization NPM_TOKEN and id-token: write; package.json publishConfig requires public access and provenance where npm/GitHub Actions support it.",
+      "publisher": ".github/workflows/release.yml is a repo-local protected GitHub Actions publisher using ubuntu-latest, inherited organization NPM_TOKEN, id-token: write, npm publish --provenance, npm registry readback, install smoke, release tag creation, GitHub release readback, and uploaded release evidence.",
       "requiredContexts": [
         "risk-classification/pass",
         "ci",
         "trunk-admission/pass"
       ],
-      "publishProof": "npm registry readback, package README/readme metadata readback, GitHub release readback, release workflow run evidence, package integrity, and npm attestations/provenance readback when emitted by the registry."
+      "publishProof": "npm registry readback, package README/readme metadata readback, GitHub release readback, release workflow run evidence, package integrity, npm attestations/provenance readback, and install smoke evidence."
     }
   },
   "adoption": {

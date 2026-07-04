@@ -118,4 +118,4 @@ MCP clients should launch the binary over stdio:
 
 This repository dogfoods [GroundAtlas](https://github.com/SylphxAI/groundatlas) through CI. Vendor-neutral project facts live in `project.manifest.json`; Sylphx-specific governance facts stay in `.doctrine/project.json`; generated `.groundatlas*` reports are evidence/navigation only, not source of truth.
 
-Public npm publication is owned by `.github/workflows/release.yml` and the shared Sylphx Changesets publisher. A package version is only released after protected CI publishes it and npm registry/GitHub release readback proves the result. Local package proof remains `npm run verify` plus CI evidence; generated `.groundatlas*` files are not publication proof.
+Public npm publication is owned by `.github/workflows/release.yml`: a protected GitHub Actions release workflow that runs npm-locked verification, GroundAtlas release dogfood, npm provenance publish, registry readback, install smoke, tag creation, and GitHub release readback. Local package proof remains `npm run verify` plus CI evidence; generated `.groundatlas*` files are not publication proof.

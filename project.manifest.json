@@ -111,7 +111,7 @@
       "type": "workflow",
       "name": "Release/publish",
       "path": ".github/workflows/release.yml",
-      "description": "Protected Changesets npm release workflow using the shared Sylphx publisher and package provenance settings."
+      "description": "Protected GitHub-hosted npm release workflow with provenance publish, registry readback, install smoke, tag creation, and GitHub release readback."
     },
     {
       "type": "docs",
@@ -149,6 +149,6 @@
   ],
   "adoption": {
     "status": "adopted",
-    "notes": "Vendor-neutral GroundAtlas manifest for package/action dogfooding. .doctrine/project.json remains the Sylphx Doctrine adapter and local governance catalog. Generated .groundatlas* reports are evidence/navigation only, not source of truth. Public npm release is controlled by Changesets plus the protected Sylphx release workflow; publication is only complete after registry and GitHub release readback."
+    "notes": "Vendor-neutral GroundAtlas manifest for package/action dogfooding. .doctrine/project.json remains the Sylphx Doctrine adapter and local governance catalog. Generated .groundatlas* reports are evidence/navigation only, not source of truth. Public npm release is controlled by Changesets release intent plus the protected GitHub-hosted release workflow; publication is only complete after npm registry, install-smoke, and GitHub release readback."
   }
 }
