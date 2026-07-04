@@ -86,8 +86,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npm view "${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}" version dist-tags time gitHead dist.integrity dist.attestations --json | tee "$RUNNER_TEMP/npm-readback.json"
-          node -e "const r=require(process.env.RUNNER_TEMP + '/npm-readback.json'); if (r.version !== '${{ steps.pkg.outputs.version }}') throw new Error('npm readback version mismatch')"
+          for attempt in $(seq 1 40); do
+            echo "npm registry readback attempt ${attempt}/40"
+            if npm view "${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}" version dist-tags time gitHead dist.integrity dist.attestations --json > "$RUNNER_TEMP/npm-readback.json"; then
+              cat "$RUNNER_TEMP/npm-readback.json"
+              node -e "const r=require(process.env.RUNNER_TEMP + '/npm-readback.json'); if (r.version !== '${{ steps.pkg.outputs.version }}') throw new Error('npm readback version mismatch')"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "npm registry readback did not converge for ${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}" >&2
+          exit 1
 
       - name: Smoke installed package
         shell: bash

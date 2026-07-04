@@ -19,7 +19,7 @@
 4. Merge the version PR only after its CI and release workflow gates pass.
 5. Verify the publish from npm and GitHub release readback.
 
-The release workflow runs on GitHub-hosted runners because npm provenance currently rejects self-hosted GitHub Actions provenance bundles. PR/main CI still runs on the normal Sylphx runner pool.
+The release workflow runs on GitHub-hosted runners because npm provenance currently rejects self-hosted GitHub Actions provenance bundles. PR/main CI still runs on the normal Sylphx runner pool. npm registry readback for a newly created scoped package can lag the successful publish response; the workflow retries readback before tag/release creation instead of treating first-read E404 as final truth.
 
 ## Required publish proof
 
