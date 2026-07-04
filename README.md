@@ -11,9 +11,9 @@ The beta design intentionally exposes **four thin typed MCP tools** backed by **
 
 ## Status
 
-Version: `0.1.0-beta.0`
+Release channel: `0.x` beta. The latest public package version is the npm registry value for `@sylphx/consultant-mcp`.
 
-This is a production-shaped beta, not a final hosted service. It includes:
+This is a production-shaped beta package, not a final hosted service. It includes:
 
 - MCP stdio server
 - OpenRouter-compatible provider adapter
@@ -69,10 +69,19 @@ For local deterministic testing:
 export CONSULTANT_MOCK=true
 ```
 
-## Run
+## Install and Run
+
+From npm after the protected release workflow publishes the package:
 
 ```bash
-npm install
+npm install -g @sylphx/consultant-mcp
+CONSULTANT_MOCK=true sylphx-consultant-mcp
+```
+
+For local development from source:
+
+```bash
+npm ci
 npm run build
 CONSULTANT_MOCK=true node dist/server.js
 ```
@@ -109,4 +118,4 @@ MCP clients should launch the binary over stdio:
 
 This repository dogfoods [GroundAtlas](https://github.com/SylphxAI/groundatlas) through CI. Vendor-neutral project facts live in `project.manifest.json`; Sylphx-specific governance facts stay in `.doctrine/project.json`; generated `.groundatlas*` reports are evidence/navigation only, not source of truth.
 
-The beta package metadata is publishable, but public npm publication is not complete until a protected release workflow publishes it and npm registry/readme/provenance readback proves the result. Local package proof remains `npm run verify` plus CI evidence.
+Public npm publication is owned by `.github/workflows/release.yml` and the shared Sylphx Changesets publisher. A package version is only released after protected CI publishes it and npm registry/GitHub release readback proves the result. Local package proof remains `npm run verify` plus CI evidence; generated `.groundatlas*` files are not publication proof.

@@ -132,14 +132,14 @@
     }
   },
   "delivery": {
-    "ciModel": "adr29-admission-with-groundatlas",
+    "ciModel": "adr29-admission-with-groundatlas-and-protected-npm-release",
     "requiredContexts": [
       "risk-classification/pass",
       "ci",
       "trunk-admission/pass"
     ],
-    "deployPath": "Pull requests and merge groups run .github/workflows/ci.yml with ADR-29 admission contexts, npm run verify, project-control boundary tests, and GroundAtlas package dogfood. Main pushes run the same CI/postsubmit proof. No release workflow is enabled yet; beta package publication remains a separate release-control decision.",
-    "productionProof": "npm run verify, project-control boundary tests, GroundAtlas package dogfood, PR/merge-group/main CI evidence, dry-run package contents, and npm registry/readme readback only after a future publish workflow publishes a beta version.",
+    "deployPath": "Pull requests and merge groups run .github/workflows/ci.yml with ADR-29 admission contexts, npm run verify, project-control boundary tests, and GroundAtlas package dogfood. Main pushes run CI/postsubmit proof plus .github/workflows/release.yml, which uses Changesets release intent and the shared Sylphx npm publisher for public package releases.",
+    "productionProof": "npm run verify, project-control boundary tests, GroundAtlas package dogfood, PR/merge-group/main CI evidence, dry-run package contents, protected release workflow evidence, npm registry/readback including integrity and attestations when present, and GitHub release readback.",
     "recoveryClass": "forward-fix-only",
     "deployable": false,
     "packageRelease": {
@@ -147,32 +147,20 @@
       "ecosystems": [
         "npm"
       ],
-      "releaseIntent": "Before public beta publication, npm release intent must use Changesets or a repo-local ADR-59 equivalent and a protected GitHub Actions release workflow.",
-      "versionPr": "Version PRs must be bot or GitHub App-owned, with sylphx-release-bot as the default identity when installed.",
-      "publisher": "No repo-local publisher is enabled in this slice. A future protected GitHub Actions release workflow should publish through OIDC/trusted publishing where supported, with any npm token kept as a bounded fallback.",
+      "releaseIntent": "Public package release intent uses Changesets files under .changeset/ and protected GitHub Actions release automation.",
+      "versionPr": "Changesets version PRs are the default package-version path after release workflow adoption; bootstrap release-enablement PRs must carry explicit release intent and pass the same gates.",
+      "publisher": ".github/workflows/release.yml delegates to SylphxAI/.github reusable release/publish-npm workflows with inherited organization NPM_TOKEN and id-token: write; package.json publishConfig requires public access and provenance where npm/GitHub Actions support it.",
       "requiredContexts": [
         "risk-classification/pass",
         "ci",
         "trunk-admission/pass"
       ],
-      "publishProof": "npm registry readback, package README readback, release workflow evidence, and provenance or attestation evidence for published beta package versions."
+      "publishProof": "npm registry readback, package README/readme metadata readback, GitHub release readback, release workflow run evidence, package integrity, and npm attestations/provenance readback when emitted by the registry."
     }
   },
   "adoption": {
     "status": "adopted",
     "gaps": [
-      {
-        "id": "package-publish-workflow-missing",
-        "description": "The beta package metadata exists but @sylphx/consultant-mcp is not yet published to npm; publication needs a dedicated release workflow/Changesets decision and registry readback before claiming package-publication done.",
-        "owner": "SylphxAI/consultant-mcp",
-        "target": "before public beta publication"
-      },
-      {
-        "id": "release-runbook-missing",
-        "description": "Published beta package versions are forward-only for consumers; add bad-release and registry recovery guidance before full adoption.",
-        "owner": "SylphxAI/consultant-mcp",
-        "target": "before adoption.status becomes full"
-      },
       {
         "id": "hosted-service-boundary-deferred",
         "description": "README intentionally defers hosted Consultant Service capabilities; a future service repo or ADR must own persistence, queues, cache, and admin UI before those features are built.",

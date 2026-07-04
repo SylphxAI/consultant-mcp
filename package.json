@@ -1,8 +1,9 @@
 {
   "name": "@sylphx/consultant-mcp",
-  "version": "0.1.0-beta.0",
+  "version": "0.1.0",
   "description": "Beta MCP server for typed SOTA consultation, model fan-out, and judge synthesis for autonomous agents.",
   "type": "module",
+  "packageManager": "npm@10.9.8",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -20,7 +21,9 @@
     "examples",
     "README.md",
     "REPORT.md",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md",
+    "SECURITY.md"
   ],
   "scripts": {
     "dev": "tsx src/server.ts",
@@ -63,6 +66,7 @@
   },
   "homepage": "https://github.com/SylphxAI/consultant-mcp#readme",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   }
 }

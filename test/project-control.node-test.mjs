@@ -35,12 +35,12 @@ test('Doctrine adapter remains Sylphx-specific and package publication boundary 
       (surface) => surface.type === 'manifest' && surface.location === 'project.manifest.json'
     )
   )
-  assert.equal(doctrine.delivery.ciModel, 'adr29-admission-with-groundatlas')
+  assert.equal(doctrine.delivery.ciModel, 'adr29-admission-with-groundatlas-and-protected-npm-release')
   assert.ok(doctrine.delivery.productionProof.includes('GroundAtlas package dogfood'))
-  assert.ok(doctrine.delivery.packageRelease.publisher.includes('No repo-local publisher is enabled'))
-  assert.ok(
-    doctrine.adoption.gaps.some((gap) => gap.id === 'package-publish-workflow-missing')
-  )
+  assert.ok(doctrine.delivery.productionProof.includes('protected release workflow evidence'))
+  assert.ok(doctrine.delivery.packageRelease.releaseIntent.includes('Changesets'))
+  assert.ok(doctrine.delivery.packageRelease.publisher.includes('SylphxAI/.github'))
+  assert.ok(!doctrine.adoption.gaps.some((gap) => gap.id === 'package-publish-workflow-missing'))
 })
 
 test('CI verifies the package and dogfoods the released GroundAtlas package/action', () => {
@@ -57,7 +57,7 @@ test('CI verifies the package and dogfoods the released GroundAtlas package/acti
   assert.ok(workflow.includes('.doctrine/project.json'))
 })
 
-test('package scripts expose reproducible local gates without enabling publish', () => {
+test('package scripts expose reproducible local gates and protected publication metadata', () => {
   const pkg = readJson('package.json')
 
   assert.equal(pkg.scripts.verify, 'npm run typecheck && npm test && npm run build && npm run pack:beta')
@@ -67,5 +67,26 @@ test('package scripts expose reproducible local gates without enabling publish',
     'npm exec --yes --package groundatlas@0.1.2 -- ga fleet . --out .groundatlas-pilot --require-atlas --strict --json'
   )
   assert.equal(pkg.scripts['changeset:publish'], undefined)
-  assert.equal(existsSync('.github/workflows/release.yml'), false)
+  assert.match(pkg.packageManager, /^npm@/)
+  assert.equal(pkg.publishConfig.access, 'public')
+  assert.equal(pkg.publishConfig.provenance, true)
+  assert.equal(readJson('package-lock.json').packages[''].version, pkg.version)
+  assert.equal(existsSync('CHANGELOG.md'), true)
+  assert.equal(existsSync('.github/workflows/release.yml'), true)
+  assert.equal(existsSync('.changeset/config.json'), true)
+})
+
+test('release workflow uses protected Sylphx npm publication path', () => {
+  const workflow = readText('.github/workflows/release.yml')
+
+  assert.ok(workflow.includes('push:'))
+  assert.ok(workflow.includes('branches: [main]'))
+  assert.ok(workflow.includes('id-token: write'))
+  assert.ok(workflow.includes('uses: SylphxAI/.github/.github/workflows/release.yml@main'))
+  assert.ok(workflow.includes('build: npm run verify'))
+  assert.ok(workflow.includes('npm run test:project-control'))
+  assert.ok(workflow.includes('ga update --out .groundatlas-pilot'))
+  assert.ok(workflow.includes('ga audit --out .groundatlas-pilot'))
+  assert.ok(workflow.includes('npm run --silent groundatlas:fleet'))
+  assert.ok(workflow.includes('secrets: inherit'))
 })
