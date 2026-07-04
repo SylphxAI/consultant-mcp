@@ -7,7 +7,7 @@ while preserving project truth boundaries:
 
 - `project.manifest.json` is the vendor-neutral per-project control file.
 - `.doctrine/project.json` is the Sylphx Doctrine adapter and governance catalog.
-- `.groundatlas*` outputs are generated evidence/navigation only, not SSOT.
+- `.groundatlas*` files plus GroundAtlas JSON/Markdown reports are generated evidence/navigation only, not SSOT.
 
 ## Required Read Path
 
@@ -26,14 +26,15 @@ The CI workflow must:
 - install with `npm ci`;
 - run `npm run verify` for typecheck, tests, build, and dry-run npm package verification;
 - run `npm run test:project-control`;
-- run `SylphxAI/groundatlas@v0.1.2` with `package-spec: groundatlas@0.1.2`;
+- run `SylphxAI/groundatlas@v0.1.3` with `package-spec: groundatlas@0.1.3`;
 - require generated atlas evidence and strict fleet status;
-- upload GroundAtlas reports as CI artifacts.
+- assert the Markdown fleet scorecard title and adopted summary;
+- upload GroundAtlas JSON and Markdown reports as CI artifacts.
 
 ## Publication Boundary
 
-The package metadata is publishable, but `@sylphx/consultant-mcp` is not yet
-published to npm. Public beta publication is complete only after a separate
-release workflow/Changesets decision lands, publishes from protected CI, and is
-verified through npm registry/readme/provenance readback. Do not manually publish
-from a workstation as the normal path.
+The package metadata is public and publishable through the protected release
+workflow. Public beta publication is complete only after protected CI/release
+workflow evidence, npm provenance publication or existing-version readback, npm
+registry/readme readback, install smoke, and GitHub release readback. Do not
+manually publish from a workstation as the normal path.

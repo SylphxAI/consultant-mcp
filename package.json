@@ -34,7 +34,7 @@
     "clean": "rm -rf dist *.tgz",
     "verify": "npm run typecheck && npm test && npm run build && npm run pack:beta",
     "test:project-control": "node --test test/project-control.node-test.mjs",
-    "groundatlas:fleet": "npm exec --yes --package groundatlas@0.1.2 -- ga fleet . --out .groundatlas-pilot --require-atlas --strict --json"
+    "groundatlas:fleet": "npm exec --yes --package groundatlas@0.1.3 -- ga fleet . --out .groundatlas-pilot --require-atlas --strict --json"
   },
   "keywords": [
     "mcp",
