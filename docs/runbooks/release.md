@@ -15,9 +15,11 @@
 
 1. Add a Changesets release-intent file that describes the package change.
 2. Merge the implementation PR after CI, project-control tests, and GroundAtlas dogfood pass.
-3. Let `.github/workflows/release.yml` create or update the Changesets version PR.
+3. Let `.github/workflows/release.yml` create or update the Changesets version PR, or publish an already-versioned bootstrap release.
 4. Merge the version PR only after its CI and release workflow gates pass.
 5. Verify the publish from npm and GitHub release readback.
+
+The reusable release workflow installs Bun before its first validation step and sets up Node/npm immediately before registry publish. Release-workflow validation therefore uses Bun-native commands before publish, while PR/main CI remains the npm-locked package gate.
 
 ## Required publish proof
 
