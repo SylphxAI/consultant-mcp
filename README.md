@@ -9,6 +9,8 @@
 
 The beta design intentionally exposes **four thin typed MCP tools** backed by **one shared deliberation engine**. The tool split is an agent-facing product contract; the fan-out, policy, redaction, and judge synthesis are shared implementation.
 
+SOTA family roadmap: [docs/roadmap/sota-family-roadmap.md](docs/roadmap/sota-family-roadmap.md).
+
 ## Status
 
 Release channel: `0.x` beta. The latest public package version is the npm registry value for `@sylphx/consultant-mcp`.
