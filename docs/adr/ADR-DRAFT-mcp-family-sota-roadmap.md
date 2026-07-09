@@ -1,7 +1,7 @@
 # ADR Draft: Adopt Consultant MCP Family SOTA Roadmap
 
-Date: 2026-07-09  
-Status: Draft, blocked from remote PR because the repository is archived  
+Date: 2026-07-09
+Status: Draft, blocked from remote PR because the repository is archived
 Slug: mcp-family-sota-roadmap
 
 ## Context
