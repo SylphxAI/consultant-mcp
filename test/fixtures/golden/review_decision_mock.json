@@ -1,0 +1,71 @@
+{
+  "consultationId": "consult_ab7e630e373c3811e15fa4a8_NORMALIZED",
+  "kind": "review_decision",
+  "status": "completed",
+  "verdict": "accept_with_changes",
+  "confidence": 0.78,
+  "executiveSummary": "Mock judge: design is viable for beta if policy, schemas, and observability stay explicit.",
+  "consensus": [
+    "Use typed intent tools",
+    "Keep a shared fan-out/judge engine",
+    "Treat external providers as adapters"
+  ],
+  "disagreements": [
+    "How many tools to expose after beta should be usage-driven"
+  ],
+  "blindSpots": [
+    "Persistent ledger is intentionally deferred from in-package beta"
+  ],
+  "recommendedChanges": [
+    {
+      "priority": "must",
+      "change": "Keep privacy and budget gates before provider calls",
+      "rationale": "Prevents uncontrolled data/cost exposure"
+    }
+  ],
+  "evidenceGaps": [
+    "Run against real providers in staging"
+  ],
+  "followUpQuestions": [
+    "Which repository and npm registry should own the package?"
+  ],
+  "citations": [],
+  "panel": [
+    {
+      "model": "mock-a",
+      "role": "panelist",
+      "ok": true,
+      "content": "Mock panel for mock-a: typed Consultant MCP is appropriate; enforce budget/privacy and synthesize with a judge.",
+      "latencyMs": 0
+    },
+    {
+      "model": "mock-b",
+      "role": "panelist",
+      "ok": true,
+      "content": "Mock panel for mock-b: typed Consultant MCP is appropriate; enforce budget/privacy and synthesize with a judge.",
+      "latencyMs": 0
+    },
+    {
+      "model": "mock-judge",
+      "role": "judge",
+      "ok": true,
+      "content": "{\"verdict\":\"accept_with_changes\",\"confidence\":0.78,\"executiveSummary\":\"Mock judge: design is viable for beta if policy, schemas, and observability stay explicit.\",\"consensus\":[\"Use typed intent tools\",\"Keep a shared fan-out/judge engine\",\"Treat external providers as adapters\"],\"disagreements\":[\"How many tools to expose after beta should be usage-driven\"],\"blindSpots\":[\"Persistent ledger is intentionally deferred from in-package beta\"],\"recommendedChanges\":[{\"priority\":\"must\",\"change\":\"Keep privacy and budget gates before provider calls\",\"rationale\":\"Prevents uncontrolled data/cost exposure\"}],\"evidenceGaps\":[\"Run against real providers in staging\"],\"followUpQuestions\":[\"Which repository and npm registry should own the package?\"],\"citations\":[]}",
+      "latencyMs": 0
+    }
+  ],
+  "policy": {
+    "privacyClass": "internal",
+    "redactionApplied": false,
+    "budgetStatus": "ok",
+    "estimatedCostUsd": 0.75
+  },
+  "providerTrace": {
+    "provider": "mock",
+    "models": [
+      "mock-a",
+      "mock-b"
+    ],
+    "judgeModel": "mock-judge",
+    "latencyMs": 0
+  }
+}

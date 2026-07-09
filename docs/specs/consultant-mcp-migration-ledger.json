@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "repo": "SylphxAI/consultant-mcp",
+  "lockedAt": "2026-07-09T19:36:19Z",
+  "inventorySource": ["mcp-tools", "proto", "manual"],
+  "inScopeBoundary": {
+    "includeGlobs": ["src/**", "crates/**", "bin/**", "proto/**"],
+    "excludeGlobs": ["node_modules/**", "dist/**"]
+  },
+  "capabilities": [
+    {
+      "id": "transport/web-mcp-http",
+      "domain": "transport",
+      "weight": 5,
+      "state": "ts_only",
+      "notes": "No Web MCP HTTP transport shipped. Target: Streamable HTTP on Rust IO shell via mcp-server-sdk contract."
+    },
+    {
+      "id": "transport/stdio-rust-rmcp",
+      "domain": "transport",
+      "weight": 4,
+      "state": "rust_impl",
+      "rustSurface": "crates/consultant-mcp-server/src/main.rs (rmcp::transport::stdio())",
+      "parityTest": "cargo test -p consultant-core parity; npm run test:parity",
+      "notes": "Default npm bin launches Rust rmcp stdio server; intermediate until Web MCP cutover."
+    },
+    {
+      "id": "transport/stdio-ts-adapter",
+      "domain": "transport",
+      "weight": 4,
+      "state": "ts_only",
+      "tsSurface": "src/server.ts",
+      "notes": "Opt-in TS stdio MCP adapter (CONSULTANT_MCP_TRANSPORT=ts env); must be deleted after Web MCP + Rust IO parity."
+    },
+    {
+      "id": "tool/consultant.review_decision",
+      "domain": "mcp-tools",
+      "weight": 4,
+      "state": "parity_proven",
+      "tsSurface": "src/server.ts",
+      "rustSurface": "crates/consultant-mcp-server/src/lib.rs",
+      "protoRpc": "consultant.v1.ReviewDecisionInput",
+      "parityTest": "test/fixtures/golden/review_decision_mock.json; cargo test -p consultant-core parity",
+      "notes": "Rust rmcp tool routes to consultant-core deliberation engine with mock parity proof."
+    },
+    {
+      "id": "tool/consultant.research",
+      "domain": "mcp-tools",
+      "weight": 4,
+      "state": "rust_impl",
+      "tsSurface": "src/server.ts",
+      "rustSurface": "crates/consultant-mcp-server/src/lib.rs",
+      "protoRpc": "consultant.v1.ResearchInput",
+      "notes": "Rust tool surface shipped; golden parity fixture deferred to next slice."
+    },
+    {
+      "id": "tool/consultant.challenge_answer",
+      "domain": "mcp-tools",
+      "weight": 4,
+      "state": "rust_impl",
+      "tsSurface": "src/server.ts",
+      "rustSurface": "crates/consultant-mcp-server/src/lib.rs",
+      "protoRpc": "consultant.v1.ChallengeAnswerInput",
+      "notes": "Rust tool surface shipped; golden parity fixture deferred to next slice."
+    },
+    {
+      "id": "tool/consultant.compare_options",
+      "domain": "mcp-tools",
+      "weight": 4,
+      "state": "rust_impl",
+      "tsSurface": "src/server.ts",
+      "rustSurface": "crates/consultant-mcp-server/src/lib.rs",
+      "protoRpc": "consultant.v1.CompareOptionsInput",
+      "notes": "Rust tool surface shipped; golden parity fixture deferred to next slice."
+    }
+  ],
+  "summary": {
+    "total": 7,
+    "ts_only": 2,
+    "contracted": 0,
+    "rust_impl": 4,
+    "parity_proven": 1,
+    "authority_rust": 0,
+    "ts_deleted": 0,
+    "completion_progress": 0.0,
+    "authority_progress": 0.143,
+    "weighted_progress": 0.286
+  }
+}
