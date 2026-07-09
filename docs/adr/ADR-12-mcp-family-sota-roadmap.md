@@ -24,9 +24,11 @@ package.
 
 - Evidence from Architecture Reader, CodeRAG, Reader MCPs, and Filesystem MCP
   can feed Consultant MCP as input.
-- TypeScript remains appropriate for provider integration and schema velocity.
-- Rust may own deterministic policy, redaction, hashing, ledger, and replay
-  primitives when needed.
+- The target MCP runtime is Rust using `modelcontextprotocol/rust-sdk` / `rmcp`.
+- Rust owns deterministic policy, redaction, hashing, ledger, replay primitives,
+  request validation, and serving.
+- Provider integrations remain replaceable modules behind the Rust policy
+  boundary.
 - Hosted persistence, queues, admin workflows, and billing remain outside this
   package unless a future ADR changes the boundary.
 

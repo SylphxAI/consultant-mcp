@@ -34,10 +34,15 @@ evidence, assumptions, disagreements, confidence, and recommendations.
 
 ## Runtime Direction
 
-TypeScript can remain the fastest provider-integration and MCP-schema surface.
-Rust is appropriate for deterministic policy, redaction primitives, request
-hashing, cache keys, local ledger storage, replay tooling, and cost accounting
-when those paths need stronger safety or performance.
+The target runtime is a Rust MCP server using
+`modelcontextprotocol/rust-sdk` / `rmcp`. Rust should own tool schemas, request
+validation, deterministic policy, redaction primitives, request hashing, cache
+keys, local ledger storage, replay tooling, and cost accounting.
+
+Provider integration remains a replaceable module behind the Rust policy
+boundary. TypeScript can remain only for migration compatibility, generated
+fixtures, or provider-specific experiments; it is not the target MCP adapter
+runtime.
 
 WASM may be useful for sandboxed scoring or policy plugins, but provider fan-out
 and judge synthesis stay explicit host behavior.
@@ -59,7 +64,7 @@ and judge synthesis stay explicit host behavior.
 - Add deterministic request hashing and redaction trace.
 - Add local consultation ledger format for replay and audit.
 - Add provider failure taxonomy and retry policy.
-- Evaluate Rust primitives for policy, hashing, redaction, ledger, and replay.
+- Add Rust primitives for policy, hashing, redaction, ledger, and replay.
 
 ### Phase 2: Evaluation Harness
 
@@ -84,6 +89,8 @@ and judge synthesis stay explicit host behavior.
   billing.
 - If a hosted service is created, keep the MCP package as a client and local
   policy boundary rather than absorbing service ownership.
+- Ship the local MCP package as a Rust server with npm optional binary
+  distribution and install diagnostics.
 
 ## Star And Adoption Strategy
 
@@ -98,3 +105,4 @@ controls, and visible evidence-gap reporting rather than generic model fan-out.
 - Provider trace includes model, latency, cost when available, and policy route.
 - Redaction is tested with sensitive fixtures.
 - Eval fixtures prevent regressions in disagreement and evidence-gap reporting.
+- Rust MCP server fixtures preserve the four public tool contracts.
