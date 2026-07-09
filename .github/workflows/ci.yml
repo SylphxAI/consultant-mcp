@@ -43,6 +43,9 @@ jobs:
       - name: Verify package
         run: npm run verify
 
+      - name: Public surface audit (README discovery)
+        run: npx vitest run test/readmeDiscovery.test.ts
+
       - name: Test project-control boundary
         run: npm run test:project-control
 

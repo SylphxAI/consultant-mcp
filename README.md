@@ -1,92 +1,107 @@
-# Sylphx Consultant MCP
+<div align="center">
 
-`@sylphx/consultant-mcp` is a **Beta 0.x** Model Context Protocol server that gives autonomous agents a typed, audited path to ask a higher-grade consultant panel for:
+# Consultant MCP
 
-- ADR / architecture / design review
-- research synthesis
-- red-team challenge of a proposed answer
-- option comparison and trade-off analysis
+### Your agent chose the architecture. **Did anyone else weigh in?**
 
-The beta design intentionally exposes **four thin typed MCP tools** backed by **one shared deliberation engine**. The tool split is an agent-facing product contract; the fan-out, policy, redaction, and judge synthesis are shared implementation.
+Beta MCP server that gives autonomous agents a typed, audited path to a **consultant panel** —
+four thin tools, one shared deliberation engine, judge synthesis, and remote models via OpenRouter.
 
-## Status
+[![npm version](https://img.shields.io/npm/v/@sylphx/consultant-mcp?style=flat-square)](https://www.npmjs.com/package/@sylphx/consultant-mcp)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-7.0-blue.svg?style=flat-square)](https://www.typescriptlang.org/)
 
-Release channel: `0.x` beta. The latest public package version is the npm registry value for `@sylphx/consultant-mcp`.
+**Beta 0.x** · **4 typed MCP tools** · **Panel fan-out + judge** · **Privacy & budget gates** · **OpenRouter-ready**
 
-This is a production-shaped beta package, not a final hosted service. It includes:
+[⭐ Star this repo](https://github.com/SylphxAI/consultant-mcp) if irreversible agent decisions should get a second opinion before they ship.
+· [Quick start](#quick-start) · [See it work](#see-it-work) · [Why not one big prompt?](#why-not-one-big-prompt)
 
-- MCP stdio server
-- OpenRouter-compatible provider adapter
-- mock provider for local tests
-- panel fan-out
-- judge synthesis
-- privacy/budget policy gate
-- secret-like redaction
-- structured output schemas
-- tests and dry-run package verification
+</div>
 
-Deferred intentionally:
+---
 
-- persistent ledger database
-- async queue API
-- web UI/admin dashboard
-- semantic cache
-- organization-level approval workflow
+## The problem
 
-Those belong in the future hosted Consultant Service, not in the first MCP package.
+Agents make irreversible calls every day — architecture, migrations, security boundaries, public
+contracts. A single host model can sound confident, cite plausible trade-offs, and still miss
+the blind spot that costs you a quarter.
 
-## Tools
+Most teams either **skip review** (ship and pray) or **paste a giant prompt** (no policy, no
+budget cap, no structured verdict, no audit trail).
 
-### `consultant.review_decision`
+**Consultant MCP is built for the moment your agent needs a governed second opinion before an
+irreversible decision lands in production.**
 
-Use for ADRs, architecture choices, production design reviews, public contracts, migrations, security decisions, and expensive irreversible choices.
+## Why not one big prompt?
 
-### `consultant.research`
+| Typical agent review | Consultant MCP |
+| --- | --- |
+| One model, one pass | Panel fan-out across configured models + judge synthesis |
+| "Sounds good" prose | Structured verdict, confidence, consensus, disagreements, blind spots |
+| Secrets in context | Privacy classes, confidential blocking, secret-like redaction |
+| Unbounded spend | Per-request and service budget gates |
+| Ad-hoc tool sprawl | **4** stable MCP product contracts over one deliberation engine |
 
-Use for research synthesis where the answer needs freshness, source quality, contradictions, and evidence gaps.
+## See it work
 
-### `consultant.challenge_answer`
-
-Use when an agent already has a proposed answer and wants skeptical review before sending or shipping.
-
-### `consultant.compare_options`
-
-Use to compare two or more options against criteria and produce a recommendation.
-
-## Configuration
+**Install once. Mock locally. Call a typed tool.**
 
 ```bash
-export OPENROUTER_API_KEY="..." # or OPENROUTER_FUSION_API_KEY
-export CONSULTANT_PANEL_MODELS="openai/gpt-4.1,anthropic/claude-sonnet-4,google/gemini-2.5-pro"
-export CONSULTANT_JUDGE_MODEL="openrouter/fusion"
-export CONSULTANT_DEFAULT_MAX_USD="2"
-export CONSULTANT_ALLOW_CONFIDENTIAL_EXTERNAL="false"
+claude mcp add consultant -- env CONSULTANT_MOCK=true sylphx-consultant-mcp
 ```
 
-For local deterministic testing:
+Challenge a proposed answer before the agent ships it:
+
+```json
+{
+  "task": "Ship the new auth middleware this sprint",
+  "proposedAnswer": "Use JWT in localStorage; refresh tokens rotate client-side.",
+  "context": "B2B SaaS, browser + mobile clients, SOC2 in scope.",
+  "challengeMode": "production_readiness",
+  "privacyClass": "internal"
+}
+```
+
+`consultant.challenge_answer` fans out to the panel, redacts secret-like strings, enforces
+budget policy, and returns a judge-synthesized result:
+
+```json
+{
+  "status": "completed",
+  "verdict": "accept_with_changes",
+  "confidence": 0.82,
+  "executiveSummary": "JWT-in-localStorage is a known XSS surface; move tokens to httpOnly cookies and document refresh rotation.",
+  "blindSpots": ["No mention of CSRF strategy for cookie-based auth"],
+  "recommendedChanges": [
+    { "priority": "must", "change": "Store access tokens in httpOnly, Secure, SameSite cookies" }
+  ]
+}
+```
+
+Abbreviated shape — full schema in [docs/usage.md](docs/usage.md).
+
+## Why agents use it
+
+| Need | What you get |
+| --- | --- |
+| Review an irreversible decision | `consultant.review_decision` — ADR, architecture, migration, security |
+| Synthesize scoped research | `consultant.research` — freshness, citations, evidence gaps |
+| Red-team a draft answer | `consultant.challenge_answer` — skeptical / red-team / production-readiness modes |
+| Compare options | `consultant.compare_options` — weighted criteria + recommendation |
+| Stay inside policy | Privacy classes, confidential external blocking, budget caps |
+| Test without spend | `CONSULTANT_MOCK=true` deterministic local panel |
+
+## Quick Start
+
+### Claude Code
 
 ```bash
-export CONSULTANT_MOCK=true
+claude mcp add consultant -- sylphx-consultant-mcp
 ```
 
-## Install and Run
+Set `OPENROUTER_API_KEY` (or `OPENROUTER_FUSION_API_KEY`) in the server environment.
 
-From npm after the protected release workflow publishes the package:
-
-```bash
-npm install -g @sylphx/consultant-mcp
-CONSULTANT_MOCK=true sylphx-consultant-mcp
-```
-
-For local development from source:
-
-```bash
-npm ci
-npm run build
-CONSULTANT_MOCK=true node dist/server.js
-```
-
-MCP clients should launch the binary over stdio:
+### Claude Desktop / any MCP host
 
 ```json
 {
@@ -102,6 +117,36 @@ MCP clients should launch the binary over stdio:
 }
 ```
 
+### Local development (mock panel)
+
+```bash
+npm ci && npm run build
+CONSULTANT_MOCK=true sylphx-consultant-mcp
+```
+
+## MCP Tool Surface
+
+| Tool | Use it when the agent needs to... |
+| --- | --- |
+| `consultant.review_decision` | Review an ADR, architecture choice, migration, or other high-stakes design |
+| `consultant.research` | Synthesize research with scope, freshness, citations, and evidence gaps |
+| `consultant.challenge_answer` | Red-team a proposed answer before sending or shipping |
+| `consultant.compare_options` | Compare two or more options and get a structured recommendation |
+
+All four tools share one deliberation engine — panel fan-out, policy gate, redaction, and judge
+synthesis. See [docs/architecture.md](docs/architecture.md).
+
+## Configuration
+
+```bash
+export OPENROUTER_API_KEY="..." # or OPENROUTER_FUSION_API_KEY
+export CONSULTANT_PANEL_MODELS="openai/gpt-4.1,anthropic/claude-sonnet-4,google/gemini-2.5-pro"
+export CONSULTANT_JUDGE_MODEL="openrouter/fusion"
+export CONSULTANT_DEFAULT_MAX_USD="2"
+export CONSULTANT_ALLOW_CONFIDENTIAL_EXTERNAL="false"
+export CONSULTANT_MOCK=true  # local deterministic tests
+```
+
 ## Safety model
 
 1. Every request declares or defaults `privacyClass`.
@@ -109,13 +154,48 @@ MCP clients should launch the binary over stdio:
 3. Secret-like strings are redacted before model calls.
 4. Estimated cost is checked against request and service budget.
 5. Outputs are structured for downstream agent parsing.
-6. Provider adapters are replaceable; OpenRouter Fusion is an option, not the core dependency.
 
-## Design principle
+## Status
 
-> Prompting is an implementation detail. MCP tools are product contracts for agents, policy, cost control, caching, observability, and evaluation.
-## Project Control and Publication Proof
+Release channel: **Beta 0.x** (`@sylphx/consultant-mcp` v0.1.1). Production-shaped package —
+stdio MCP server, OpenRouter adapter, mock provider, tests, and dry-run package verification.
 
-This repository dogfoods [GroundAtlas](https://github.com/SylphxAI/groundatlas) through CI. Vendor-neutral project facts live in `project.manifest.json`; Sylphx-specific governance facts stay in `.doctrine/project.json`; generated `.groundatlas*` files plus GroundAtlas JSON/Markdown reports are evidence/navigation only, not source of truth.
+Deferred to a future hosted Consultant Service: persistent ledger DB, async queue API, web UI,
+semantic cache, org-level approval workflow.
 
-Public npm publication is owned by `.github/workflows/release.yml`: a protected GitHub Actions release workflow that runs npm-locked verification, GroundAtlas release dogfood, npm provenance publish, registry readback, install smoke, tag creation, and GitHub release readback. Local package proof remains `npm run verify` plus CI evidence; generated `.groundatlas*` files are not publication proof.
+## Development
+
+```bash
+git clone https://github.com/SylphxAI/consultant-mcp.git
+cd consultant-mcp
+npm ci
+npm run verify
+```
+
+## Support
+
+- [Issues](https://github.com/SylphxAI/consultant-mcp/issues)
+- [npm package](https://www.npmjs.com/package/@sylphx/consultant-mcp)
+
+## Help this reach more builders
+
+If your agent has ever committed to an irreversible decision without a real second opinion, this
+project is for you.
+
+**[⭐ Star the repo](https://github.com/SylphxAI/consultant-mcp)** — it helps more agent builders
+find governed consultation before high-stakes choices ship.
+
+### Discovery (in progress)
+
+| Channel | Status |
+| --- | --- |
+| [Glama MCP directory](https://glama.ai/mcp/servers) | Not listed yet |
+| [Official MCP Registry](https://registry.modelcontextprotocol.io/) | Not listed yet |
+| [mcp.so submit](https://mcp.so/submit) | Not listed yet — directory submission |
+| [mcpservers.org submit](https://mcpservers.org/submit) | Not listed yet — free web-form submission |
+
+Know another MCP directory? [Open an issue](https://github.com/SylphxAI/consultant-mcp/issues/new) with the link.
+
+## License
+
+MIT © [SylphxAI](https://github.com/SylphxAI)
