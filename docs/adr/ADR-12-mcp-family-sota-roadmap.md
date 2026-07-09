@@ -1,7 +1,7 @@
-# ADR Draft: Adopt Consultant MCP Family SOTA Roadmap
+# ADR-12: Adopt Consultant MCP Family SOTA Roadmap
 
 Date: 2026-07-09
-Status: Draft, blocked from remote PR because the repository is archived
+Status: Proposed in PR #12
 Slug: mcp-family-sota-roadmap
 
 ## Context
@@ -14,7 +14,7 @@ judge synthesis, evidence gaps, and beta package verification.
 ## Decision
 
 Adopt `docs/roadmap/sota-family-roadmap.md` as the local roadmap for Consultant
-MCP's family role once the repository is writable again.
+MCP's family role.
 
 Consultant MCP owns the local/beta MCP package boundary. A hosted Consultant
 Service would require a separate ADR and should not be smuggled into this
@@ -32,6 +32,6 @@ package.
 
 ## Verification
 
-- Roadmap added locally at `docs/roadmap/sota-family-roadmap.md`.
-- README and PROJECT link to the roadmap locally.
-- Remote push is blocked because GitHub reports the repository is archived.
+- Roadmap added at `docs/roadmap/sota-family-roadmap.md`.
+- README and PROJECT link to the roadmap.
+- Docs-only validation: `git diff --check`.
