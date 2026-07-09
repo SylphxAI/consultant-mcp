@@ -1,3 +1,4 @@
+pub mod http_transport;
 pub mod tools;
 
 use consultant_core::{
@@ -130,6 +131,9 @@ impl ServerHandler for ConsultantMcp {
 
 #[cfg(test)]
 mod tests {
+    use std::fs;
+    use std::path::PathBuf;
+
     use super::ConsultantMcp;
 
     #[test]
@@ -140,5 +144,15 @@ mod tests {
         assert!(names.contains(&"consultant.research".to_string()));
         assert!(names.contains(&"consultant.challenge_answer".to_string()));
         assert!(names.contains(&"consultant.compare_options".to_string()));
+    }
+
+    #[test]
+    fn rust_http_transport_module_is_wired_for_web_mcp() {
+        let src_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("src");
+        let main_rs = fs::read_to_string(src_dir.join("main.rs")).expect("read main.rs");
+        let http_rs = fs::read_to_string(src_dir.join("http_transport.rs")).expect("read http_transport.rs");
+        assert!(main_rs.contains("http_transport::serve_http"));
+        assert!(http_rs.contains("StreamableHttpService"));
+        assert!(http_rs.contains("/mcp/health"));
     }
 }

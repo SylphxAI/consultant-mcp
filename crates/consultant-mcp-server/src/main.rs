@@ -1,4 +1,4 @@
-use consultant_mcp_server::{ConsultantMcp, SERVER_VERSION};
+use consultant_mcp_server::{http_transport, ConsultantMcp, SERVER_VERSION};
 use rmcp::ServiceExt;
 
 #[tokio::main]
@@ -9,6 +9,10 @@ async fn main() -> anyhow::Result<()> {
             consultant_core::ENGINE_NAME
         );
         return Ok(());
+    }
+
+    if http_transport::transport_from_env().is_some() {
+        return http_transport::serve_http(http_transport::HttpConfig::from_env()).await;
     }
 
     let service = ConsultantMcp::new().serve(rmcp::transport::stdio()).await?;

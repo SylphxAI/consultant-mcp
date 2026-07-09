@@ -12,8 +12,10 @@
       "id": "transport/web-mcp-http",
       "domain": "transport",
       "weight": 5,
-      "state": "ts_only",
-      "notes": "No Web MCP HTTP transport shipped. Target: Streamable HTTP on Rust IO shell via mcp-server-sdk contract."
+      "state": "rust_impl",
+      "rustSurface": "crates/consultant-mcp-server/src/http_transport.rs (rmcp StreamableHttpService)",
+      "parityTest": "test/httpTransport.matrix.test.ts; cargo test -p consultant-mcp-server",
+      "notes": "Rust rmcp streamable HTTP on /mcp + /mcp/health; npm bin routes MCP_TRANSPORT=http to Rust. TS stdio adapter remains until parity_proven + ts_deleted."
     },
     {
       "id": "transport/stdio-rust-rmcp",
@@ -76,14 +78,14 @@
   ],
   "summary": {
     "total": 7,
-    "ts_only": 2,
+    "ts_only": 1,
     "contracted": 0,
-    "rust_impl": 4,
+    "rust_impl": 5,
     "parity_proven": 1,
     "authority_rust": 0,
     "ts_deleted": 0,
     "completion_progress": 0.0,
     "authority_progress": 0.143,
-    "weighted_progress": 0.286
+    "weighted_progress": 0.429
   }
 }
