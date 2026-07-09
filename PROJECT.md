@@ -45,6 +45,7 @@ ADR changes the lifecycle and boundary.
 - MCP tool schemas and server: `src/schemas.ts`, `src/server.ts`
 - Provider adapter boundary: `src/providers/`
 - Documentation and ADRs: `README.md`, `docs/`, `docs/adr/`, and `docs/specs/`
+- SOTA family roadmap: `docs/roadmap/sota-family-roadmap.md`
 - CI/admission and GroundAtlas dogfood: `.github/workflows/ci.yml`
 
 ## Delivery
