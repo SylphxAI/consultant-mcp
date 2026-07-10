@@ -42,9 +42,9 @@
       "id": "transport/stdio-ts-adapter",
       "domain": "transport",
       "weight": 4,
-      "state": "ts_only",
+      "state": "ts_deleted",
       "tsSurface": "src/server.ts",
-      "notes": "Opt-in TS stdio MCP adapter (CONSULTANT_MCP_TRANSPORT=ts env); must be deleted after Web MCP + Rust IO parity."
+      "notes": "TS stdio MCP adapter retired; bin/sylphx-consultant-mcp delegates solely to Rust rmcp."
     },
     {
       "id": "tool/consultant.review_decision",
