@@ -188,7 +188,7 @@ pub async fn serve_http(config: HttpConfig) -> anyhow::Result<()> {
     let mcp_router = Router::new()
         .route("/health", get(health_check))
         .route("/health", options(|| async { StatusCode::NO_CONTENT }))
-        .nest_service("/", mcp_service)
+        .fallback_service(mcp_service)
         .layer(middleware::from_fn_with_state(
             shared_config.clone(),
             api_key_middleware,

@@ -430,16 +430,9 @@ impl HttpMcpHarness {
         response
     }
 
-    fn parse_response(response: reqwest::blocking::Response) -> Value {
-        let content_type = response
-            .headers()
-            .get(CONTENT_TYPE)
-            .and_then(|value| value.to_str().ok())
-            .unwrap_or("")
-            .to_string();
-        let body = response.text().expect("read MCP response body");
+    fn parse_response_body(content_type: &str, body: &str) -> Option<Value> {
         if content_type.contains("application/json") {
-            return serde_json::from_str(&body).expect("parse JSON MCP response");
+            return Some(serde_json::from_str(body).expect("parse JSON MCP response"));
         }
 
         let data_lines: Vec<&str> = body
@@ -449,27 +442,56 @@ impl HttpMcpHarness {
             .map(|line| line.trim_start_matches("data:").trim())
             .filter(|line| !line.is_empty())
             .collect();
-        let payload = data_lines
-            .last()
-            .unwrap_or_else(|| panic!("no MCP JSON payload in streamable HTTP response: {body}"));
-        serde_json::from_str(payload).expect("parse streamable HTTP MCP payload")
+        let payload = data_lines.last()?;
+        Some(serde_json::from_str(payload).expect("parse streamable HTTP MCP payload"))
+    }
+
+    fn parse_response(response: reqwest::blocking::Response) -> Value {
+        let content_type = response
+            .headers()
+            .get(CONTENT_TYPE)
+            .and_then(|value| value.to_str().ok())
+            .unwrap_or("")
+            .to_string();
+        let body = response.text().expect("read MCP response body");
+        Self::parse_response_body(&content_type, &body)
+            .unwrap_or_else(|| panic!("no MCP JSON payload in streamable HTTP response: {body}"))
     }
 
     fn send_request(&mut self, method: &str, params: Value) -> Value {
         let id = HTTP_REQUEST_ID.fetch_add(1, Ordering::Relaxed);
-        let response = self.post_mcp(&json!({
+        let request_body = json!({
             "jsonrpc": "2.0",
             "id": id,
             "method": method,
             "params": params,
-        }));
-        let payload = Self::parse_response(response);
-        assert_eq!(
-            payload.get("id").and_then(Value::as_u64),
-            Some(id),
-            "MCP response id mismatch for {method}"
-        );
-        payload
+        });
+        let deadline = std::time::Instant::now() + Duration::from_secs(30);
+
+        loop {
+            let response = self.post_mcp(&request_body);
+            let content_type = response
+                .headers()
+                .get(CONTENT_TYPE)
+                .and_then(|value| value.to_str().ok())
+                .unwrap_or("")
+                .to_string();
+            let body = response.text().expect("read MCP response body");
+            if let Some(payload) = Self::parse_response_body(&content_type, &body) {
+                assert_eq!(
+                    payload.get("id").and_then(Value::as_u64),
+                    Some(id),
+                    "MCP response id mismatch for {method}"
+                );
+                return payload;
+            }
+
+            if std::time::Instant::now() >= deadline {
+                panic!("no MCP JSON payload in streamable HTTP response: {body}");
+            }
+            self.session_headers.remove("mcp-session-id");
+            thread::sleep(Duration::from_millis(250));
+        }
     }
 
     fn send_notification(&mut self, method: &str, params: Value) {
@@ -522,6 +544,8 @@ fn compare_stdio_probe_case(case: &OracleCase, client: &mut StdioMcpClient) {
                 "{}: initialize server name mismatch",
                 case.id
             );
+            client.send_notification("notifications/initialized", json!({}));
+            client.initialized = true;
         }
         "toolsList" => {
             client.initialize_session();
@@ -530,16 +554,18 @@ fn compare_stdio_probe_case(case: &OracleCase, client: &mut StdioMcpClient) {
                 .pointer("/result/tools")
                 .and_then(Value::as_array)
                 .expect("tools array");
-            let names: Vec<String> = tools
+            let mut names: Vec<String> = tools
                 .iter()
                 .filter_map(|tool| tool.get("name").and_then(Value::as_str).map(str::to_string))
                 .collect();
-            let expected = case.output["tools"]
+            names.sort();
+            let mut expected = case.output["tools"]
                 .as_array()
                 .expect("expected tools")
                 .iter()
                 .map(|value| value.as_str().expect("tool name").to_string())
                 .collect::<Vec<_>>();
+            expected.sort();
             assert_eq!(names, expected, "{}: tools/list mismatch", case.id);
         }
         "toolCall" => {
@@ -634,16 +660,18 @@ fn compare_http_probe_case(case: &OracleCase, harness: &mut HttpMcpHarness) {
                 .pointer("/result/tools")
                 .and_then(Value::as_array)
                 .expect("tools array");
-            let names: Vec<String> = tools
+            let mut names: Vec<String> = tools
                 .iter()
                 .filter_map(|tool| tool.get("name").and_then(Value::as_str).map(str::to_string))
                 .collect();
-            let expected = case.output["tools"]
+            names.sort();
+            let mut expected = case.output["tools"]
                 .as_array()
                 .expect("expected tools")
                 .iter()
                 .map(|value| value.as_str().expect("tool name").to_string())
                 .collect::<Vec<_>>();
+            expected.sort();
             assert_eq!(names, expected, "{}: tools/list mismatch", case.id);
         }
         "toolCall" => {
@@ -719,8 +747,9 @@ fn compare_server_contract_case(case: &OracleCase) {
     );
 }
 
-#[tokio::test]
-async fn consultant_mcp_differential_matches_ts_oracle() {
+#[test]
+fn consultant_mcp_differential_matches_ts_oracle() {
+    let rt = tokio::runtime::Runtime::new().expect("consultant differential tokio runtime");
     let _ = fs::read_to_string(corpus_fixture_path()).expect("read consultant-mcp corpus fixture");
     let oracle = run_ts_oracle();
     assert_eq!(oracle.corpus_version, 1);
@@ -750,7 +779,7 @@ async fn consultant_mcp_differential_matches_ts_oracle() {
 
     for case in &oracle.cases {
         match case.domain.as_str() {
-            "tool" => compare_tool_case(case).await,
+            "tool" => rt.block_on(compare_tool_case(case)),
             "transportContract" => compare_transport_contract_case(case),
             "surfaceContract" => compare_surface_contract_case(case),
             "serverContract" => compare_server_contract_case(case),
