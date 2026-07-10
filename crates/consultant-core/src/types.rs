@@ -97,6 +97,7 @@ pub struct ChallengeAnswerRequest {
     #[serde(flatten)]
     pub base: ConsultationRequestBase,
     pub task: String,
+    #[serde(rename = "proposedAnswer")]
     pub proposed_answer: String,
 }
 

@@ -25,4 +25,20 @@ describe("web MCP HTTP transport routing", () => {
     expect(httpTransport).toContain("health_check");
     expect(mainRs).toContain("http_transport::serve_http");
   });
+
+  it("migration ledger marks transport/web-mcp-http as authority_rust", () => {
+    const ledger = JSON.parse(
+      readFileSync(path.join(repoRoot, "docs/specs/consultant-mcp-migration-ledger.json"), "utf8")
+    ) as {
+      capabilities: Array<{ id: string; state: string }>;
+    };
+    const http = ledger.capabilities.find((cap) => cap.id === "transport/web-mcp-http");
+    expect(http?.state).toBe("authority_rust");
+  });
+
+  it("HTTP authority gate script exists", () => {
+    const script = readFileSync(path.join(repoRoot, "scripts/check-no-ts-http-backend.sh"), "utf8");
+    expect(script).toContain("authority_rust");
+    expect(script).toContain("StreamableHttpService");
+  });
 });

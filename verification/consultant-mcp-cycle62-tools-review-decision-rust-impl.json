@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "repo": "SylphxAI/consultant-mcp",
+  "cycle": "cycle62",
+  "reauditRef": "rej-010",
+  "verifiedAt": "2026-07-10T52:00:00Z",
+  "status": "rust_impl_on_disk_verified",
+  "executionStatus": "harness_present_shell_unavailable",
+  "promotionPolicy": "NO_PROMOTIONS — rust_impl ONLY per rej-010; proof.status remains missing until differential_green at bound SHAs",
+  "slice": "tool.consultant.review_decision",
+  "capabilities": ["tool/consultant.review_decision"],
+  "harness": {
+    "entrypoint": "scripts/run-consultant-mcp-differential.sh",
+    "differentialTest": "crates/consultant-core/tests/consultant_mcp_differential.rs#consultant_mcp_differential_matches_ts_oracle",
+    "oracle": "scripts/differential/consultant-mcp-oracle.ts",
+    "corpus": "scripts/differential/fixtures/consultant-mcp-corpus.json",
+    "matrixTest": "test/differentialHarness.matrix.test.ts",
+    "gate": "scripts/check-no-ts-tools-backend.sh"
+  },
+  "caseCounts": {
+    "reviewDecisionTool": 1,
+    "goldenMock": 4
+  },
+  "resumeCommands": [
+    "bash scripts/check-no-ts-tools-backend.sh",
+    "bun test test/differentialHarness.matrix.test.ts",
+    "bash scripts/run-consultant-mcp-differential.sh"
+  ],
+  "notes": "Cycle62 rej-010: tool.consultant.review_decision golden mock bounded differential harness on-disk verify. ts_only=0 — harness metadata only."
+}

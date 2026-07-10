@@ -84,8 +84,8 @@ For local development from source:
 
 ```bash
 npm ci
-npm run build
-CONSULTANT_MOCK=true node dist/server.js
+npm run build:rust
+CONSULTANT_MOCK=true sylphx-consultant-mcp
 ```
 
 MCP clients should launch the binary over stdio:

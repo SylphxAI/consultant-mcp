@@ -2,7 +2,6 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-TS_ENTRY="$ROOT/dist/server.js"
 
 resolve_rust_bin() {
 	if [[ -n "${CONSULTANT_MCP_RUST_BIN:-}" && -x "${CONSULTANT_MCP_RUST_BIN}" ]]; then
@@ -23,10 +22,6 @@ resolve_rust_bin() {
 	return 1
 }
 
-use_ts_transport() {
-	[[ "${CONSULTANT_MCP_TRANSPORT:-}" == "ts" ]] || [[ "${1:-}" == "ts" ]]
-}
-
 resolve_transport() {
 	if [[ -n "${CONSULTANT_MCP_TRANSPORT:-}" ]]; then
 		printf '%s\n' "${CONSULTANT_MCP_TRANSPORT}"
@@ -39,13 +34,6 @@ resolve_transport() {
 	printf '%s\n' "stdio"
 }
 
-if use_ts_transport "$@"; then
-	if [[ "${1:-}" == "ts" ]]; then
-		shift
-	fi
-	exec node "$TS_ENTRY" "$@"
-fi
-
 if bin="$(resolve_rust_bin)"; then
 	transport="$(resolve_transport)"
 	if [[ "$transport" == "http" ]]; then
@@ -55,5 +43,6 @@ if bin="$(resolve_rust_bin)"; then
 	exec "$bin" "$@"
 fi
 
-echo "[sylphx-consultant-mcp] Rust MCP server (rmcp) is not built. Run: npm run build:rust" >&2
+echo "[sylphx-consultant-mcp] Prebuilt Rust binary not found at bin/native/consultant-mcp-server." >&2
+echo "[sylphx-consultant-mcp] From npm: reinstall @sylphx/consultant-mcp. From source: npm run build:rust" >&2
 exit 1

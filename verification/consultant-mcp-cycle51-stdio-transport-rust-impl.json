@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 2,
+  "repo": "SylphxAI/consultant-mcp",
+  "cycle": "cycle51",
+  "reauditRef": "rej-010",
+  "verifiedAt": "2026-07-10T32:00:00Z",
+  "status": "rust_impl_on_disk_verified",
+  "executionStatus": "harness_present_shell_unavailable",
+  "promotionPolicy": "NO_PROMOTIONS — rust_impl ONLY per rej-010; proof.status remains missing until differential_green at bound SHAs",
+  "slice": "transport.stdio-rust-rmcp",
+  "capabilities": ["transport/stdio-rust-rmcp"],
+  "harness": {
+    "entrypoint": "scripts/run-consultant-mcp-differential.sh",
+    "differentialTest": "crates/consultant-core/tests/consultant_mcp_differential.rs",
+    "oracle": "scripts/differential/consultant-mcp-oracle.ts",
+    "corpus": "scripts/differential/fixtures/consultant-mcp-corpus.json",
+    "matrixTest": "test/differentialHarness.matrix.test.ts",
+    "gate": "scripts/check-no-ts-stdio-backend.sh"
+  },
+  "caseCounts": {
+    "stdioProbe": 6
+  },
+  "resumeCommands": [
+    "bash scripts/check-no-ts-stdio-backend.sh",
+    "bun test test/differentialHarness.matrix.test.ts",
+    "bash scripts/run-consultant-mcp-differential.sh"
+  ],
+  "notes": "Cycle51 rej-010: transport.stdio-rust-rmcp stdioProbe bounded differential harness on-disk verify. Shell unavailable (rej-007)."
+}

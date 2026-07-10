@@ -1,4 +1,5 @@
 pub mod http_transport;
+pub mod stdio_transport;
 pub mod tools;
 
 use consultant_core::{
@@ -154,5 +155,16 @@ mod tests {
         assert!(main_rs.contains("http_transport::serve_http"));
         assert!(http_rs.contains("StreamableHttpService"));
         assert!(http_rs.contains("/mcp/health"));
+    }
+
+    #[test]
+    fn rust_stdio_transport_module_is_wired_for_default_mcp() {
+        let src_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("src");
+        let main_rs = fs::read_to_string(src_dir.join("main.rs")).expect("read main.rs");
+        let stdio_rs =
+            fs::read_to_string(src_dir.join("stdio_transport.rs")).expect("read stdio_transport.rs");
+        assert!(main_rs.contains("stdio_transport::serve_stdio"));
+        assert!(stdio_rs.contains("transport::stdio"));
+        assert!(main_rs.contains("http_transport::transport_from_env"));
     }
 }

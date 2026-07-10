@@ -1,6 +1,6 @@
 {
   "consultationId": "consult_REQUEST_HASH_NORMALIZED",
-  "kind": "review_decision",
+  "kind": "challenge_answer",
   "status": "completed",
   "verdict": "accept_with_changes",
   "confidence": 0.78,

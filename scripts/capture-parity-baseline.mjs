@@ -1,11 +1,14 @@
 #!/usr/bin/env node
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { runConsultation } from "../dist/engine.js";
+import { hashRequest } from "../dist/policy.js";
 import { MockModelClient } from "../dist/providers/openrouter.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const parityDir = path.join(repoRoot, "test/fixtures/parity");
+const goldenDir = path.join(repoRoot, "test/fixtures/golden");
 
 function normalizeResult(result) {
   return {
@@ -16,28 +19,32 @@ function normalizeResult(result) {
   };
 }
 
-const request = {
-  kind: "review_decision",
-  decision: "Expose typed Consultant MCP tools backed by a shared deliberation engine.",
-  context: "Agents need high-quality design review without leaking secrets or spending unbounded budget.",
-  privacyClass: "internal",
-  constraints: ["Beta 0.x", "MCP compatible", "typed output"]
-};
+function expectedWithRequestHash(expected, request) {
+  return {
+    ...expected,
+    consultationId: `consult_${hashRequest(request)}_NORMALIZED`
+  };
+}
 
-const config = {
-  providerName: "mock",
-  panelModels: ["mock-a", "mock-b"],
-  judgeModel: "mock-judge",
-  timeoutMs: 1_000,
-  maxOutputTokens: 1_000,
-  defaultMaxUsd: 10,
-  allowConfidentialExternal: false,
-  mock: true
-};
+const parityRequests = JSON.parse(readFileSync(path.join(parityDir, "requests.json"), "utf8"));
+const parityConfig = JSON.parse(readFileSync(path.join(parityDir, "config.json"), "utf8"));
 
-const result = normalizeResult(await runConsultation(request, new MockModelClient(), config));
-const fixtureDir = path.join(repoRoot, "test/fixtures/golden");
-mkdirSync(fixtureDir, { recursive: true });
-const fixturePath = path.join(fixtureDir, "review_decision_mock.json");
-writeFileSync(fixturePath, `${JSON.stringify(result, null, 2)}\n`, "utf8");
-console.log(`[capture-parity-baseline] wrote ${fixturePath}`);
+const captureMatrix = [
+  { requestKey: "review_decision", fixture: "review_decision_mock.json" },
+  { requestKey: "research", fixture: "research_mock.json" },
+  { requestKey: "challenge_answer", fixture: "challenge_answer_mock.json" },
+  { requestKey: "compare_options", fixture: "compare_options_mock.json" }
+];
+
+mkdirSync(goldenDir, { recursive: true });
+
+for (const { requestKey, fixture } of captureMatrix) {
+  const request = parityRequests[requestKey];
+  const result = expectedWithRequestHash(
+    normalizeResult(await runConsultation(request, new MockModelClient(), parityConfig)),
+    request
+  );
+  const fixturePath = path.join(goldenDir, fixture);
+  writeFileSync(fixturePath, `${JSON.stringify(result, null, 2)}\n`, "utf8");
+  console.log(`[capture-parity-baseline] wrote ${fixturePath}`);
+}
