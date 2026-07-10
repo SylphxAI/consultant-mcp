@@ -12,6 +12,7 @@ use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::fs;
 use std::io::{BufRead, BufReader, Write};
+use std::process::ChildStdout;
 use std::net::TcpListener;
 use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
@@ -233,7 +234,7 @@ fn resolve_mcp_binary() -> PathBuf {
 struct StdioMcpClient {
     child: Child,
     stdin: std::process::ChildStdin,
-    stdout: BufReader<std::io::ChildStdout>,
+    stdout: BufReader<ChildStdout>,
     initialized: bool,
 }
 
