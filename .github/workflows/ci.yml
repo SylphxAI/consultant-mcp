@@ -38,9 +38,10 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        # Platform optionalDeps are published with this package and may be
-        # missing from the registry / lockfile during self-build.
-        run: npm ci --omit=optional
+        # Use npm install (not ci): platform optionalDependencies may be
+        # unpublished during self-build and leave the lockfile without package
+        # entries; npm ci fails closed, while npm install skips missing optional.
+        run: npm install --no-fund --no-audit
 
       - uses: dtolnay/rust-toolchain@stable
         with:

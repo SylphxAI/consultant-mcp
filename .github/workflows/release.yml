@@ -97,8 +97,9 @@ jobs:
           npm --version
 
       - name: Install dependencies
-        # Omit platform optionalDeps during self-publish (assembled from artifacts).
-        run: npm ci --omit=optional
+        # npm install (not ci): platform optionalDeps may be unpublished while
+        # this Release job is assembling/publishing them from matrix artifacts.
+        run: npm install --no-fund --no-audit
 
       - uses: dtolnay/rust-toolchain@stable
 

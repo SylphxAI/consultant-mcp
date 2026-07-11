@@ -111,8 +111,8 @@ jobs:
           node-version: "22.14.0"
 
       - name: Install dependencies
-        # Platform optionalDeps are produced by this workflow, not installed.
-        run: npm ci --omit=optional
+        # npm install (not ci): platform optionalDeps are produced here, not fetched.
+        run: npm install --no-fund --no-audit
 
       - name: Download all native artifacts
         uses: actions/download-artifact@v4
