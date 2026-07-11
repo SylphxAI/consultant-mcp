@@ -39,7 +39,20 @@
         "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
         "verifiedAt": "2026-07-11T19:05:16Z",
         "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-NEAR-COMPLETE-TICK030/verification/consultant-mcp-tip-differential.json",
-        "notes": "FINISH-LINE-NEAR-COMPLETE-TICK030: main-bound differential_green at tip 0b27abd0c7d3 (23 cases tools|stdio|http). state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013)."
+        "notes": "FINISH-LINE-NEAR-COMPLETE-TICK030: main-bound differential_green at tip 0b27abd0c7d3 (23 cases tools|stdio|http). state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013).",
+        "proofInputDigest": "0bd239eb433dac13013ca0f3d4de794347391c78860a846a11eaa23b43cc26a0",
+        "proofInputDigestFields": {
+          "tsClosure": null,
+          "rustClosure": "e32c15e1e56dddda500e3a75a326580e93d9d350dab2b261b12679e36e10b387",
+          "contracts": null,
+          "config": null,
+          "deps": null,
+          "fixtures": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+          "harness": "974f9be6c54bf91c6fbf966d7c5973dad9ae8f475513ed2f03734e5302a7badc",
+          "deploySpecs": "2d98dad88534a8f9cfc332364aa0fa0a98f47480b22905c8dc669803122a3eee"
+        },
+        "proofInputDigestVersion": 1,
+        "proofInputDigestBoundSha": "0b27abd0c7d3e5fb82bfe1e720c683eeb7dec8e0"
       },
       "promotionHold": {
         "active": true,
@@ -68,7 +81,20 @@
         "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
         "verifiedAt": "2026-07-11T19:05:16Z",
         "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-NEAR-COMPLETE-TICK030/verification/consultant-mcp-tip-differential.json",
-        "notes": "FINISH-LINE-NEAR-COMPLETE-TICK030: main-bound differential_green at tip 0b27abd0c7d3 (23 cases tools|stdio|http). state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013)."
+        "notes": "FINISH-LINE-NEAR-COMPLETE-TICK030: main-bound differential_green at tip 0b27abd0c7d3 (23 cases tools|stdio|http). state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013).",
+        "proofInputDigest": "070899182f4f4067838bf0a6d1c2dde673435e137e75bfd615870e94c76eb1de",
+        "proofInputDigestFields": {
+          "tsClosure": null,
+          "rustClosure": "f3a848df58ff267fd2c572b7b4b4a6c87c4eba6a600b74f2361affac4a00ba23",
+          "contracts": null,
+          "config": null,
+          "deps": null,
+          "fixtures": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+          "harness": "974f9be6c54bf91c6fbf966d7c5973dad9ae8f475513ed2f03734e5302a7badc",
+          "deploySpecs": "8477549420366280671f94434446fe14c9e9f175c4f7ff726d6f7b0895aa53f9"
+        },
+        "proofInputDigestVersion": 1,
+        "proofInputDigestBoundSha": "0b27abd0c7d3e5fb82bfe1e720c683eeb7dec8e0"
       },
       "promotionHold": {
         "active": true,
@@ -106,7 +132,20 @@
         "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
         "verifiedAt": "2026-07-11T19:05:16Z",
         "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-NEAR-COMPLETE-TICK030/verification/consultant-mcp-tip-differential.json",
-        "notes": "FINISH-LINE-NEAR-COMPLETE-TICK030: main-bound differential_green at tip 0b27abd0c7d3 (23 cases tools|stdio|http). state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013)."
+        "notes": "FINISH-LINE-NEAR-COMPLETE-TICK030: main-bound differential_green at tip 0b27abd0c7d3 (23 cases tools|stdio|http). state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013).",
+        "proofInputDigest": "7e7b0dd643afb18aa5bded417f9b669789fefe03764361a8fd511a6cb07293ec",
+        "proofInputDigestFields": {
+          "tsClosure": "b97ea0eb026a6bf044677a25b274b37455d4ff1fa2446b408520533556c5ac65",
+          "rustClosure": "12417d70af1a109dd199f957a20e5eeea01d16241faaf7f6f84f24718b96e2be",
+          "contracts": null,
+          "config": null,
+          "deps": null,
+          "fixtures": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+          "harness": "974f9be6c54bf91c6fbf966d7c5973dad9ae8f475513ed2f03734e5302a7badc",
+          "deploySpecs": null
+        },
+        "proofInputDigestVersion": 1,
+        "proofInputDigestBoundSha": "0b27abd0c7d3e5fb82bfe1e720c683eeb7dec8e0"
       },
       "promotionHold": {
         "active": true,
@@ -135,7 +174,20 @@
         "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
         "verifiedAt": "2026-07-11T19:05:16Z",
         "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-NEAR-COMPLETE-TICK030/verification/consultant-mcp-tip-differential.json",
-        "notes": "FINISH-LINE-NEAR-COMPLETE-TICK030: main-bound differential_green at tip 0b27abd0c7d3 (23 cases tools|stdio|http). state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013)."
+        "notes": "FINISH-LINE-NEAR-COMPLETE-TICK030: main-bound differential_green at tip 0b27abd0c7d3 (23 cases tools|stdio|http). state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013).",
+        "proofInputDigest": "7e7b0dd643afb18aa5bded417f9b669789fefe03764361a8fd511a6cb07293ec",
+        "proofInputDigestFields": {
+          "tsClosure": "b97ea0eb026a6bf044677a25b274b37455d4ff1fa2446b408520533556c5ac65",
+          "rustClosure": "12417d70af1a109dd199f957a20e5eeea01d16241faaf7f6f84f24718b96e2be",
+          "contracts": null,
+          "config": null,
+          "deps": null,
+          "fixtures": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+          "harness": "974f9be6c54bf91c6fbf966d7c5973dad9ae8f475513ed2f03734e5302a7badc",
+          "deploySpecs": null
+        },
+        "proofInputDigestVersion": 1,
+        "proofInputDigestBoundSha": "0b27abd0c7d3e5fb82bfe1e720c683eeb7dec8e0"
       },
       "promotionHold": {
         "active": true,
@@ -164,7 +216,20 @@
         "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
         "verifiedAt": "2026-07-11T19:05:16Z",
         "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-NEAR-COMPLETE-TICK030/verification/consultant-mcp-tip-differential.json",
-        "notes": "FINISH-LINE-NEAR-COMPLETE-TICK030: main-bound differential_green at tip 0b27abd0c7d3 (23 cases tools|stdio|http). state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013)."
+        "notes": "FINISH-LINE-NEAR-COMPLETE-TICK030: main-bound differential_green at tip 0b27abd0c7d3 (23 cases tools|stdio|http). state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013).",
+        "proofInputDigest": "7e7b0dd643afb18aa5bded417f9b669789fefe03764361a8fd511a6cb07293ec",
+        "proofInputDigestFields": {
+          "tsClosure": "b97ea0eb026a6bf044677a25b274b37455d4ff1fa2446b408520533556c5ac65",
+          "rustClosure": "12417d70af1a109dd199f957a20e5eeea01d16241faaf7f6f84f24718b96e2be",
+          "contracts": null,
+          "config": null,
+          "deps": null,
+          "fixtures": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+          "harness": "974f9be6c54bf91c6fbf966d7c5973dad9ae8f475513ed2f03734e5302a7badc",
+          "deploySpecs": null
+        },
+        "proofInputDigestVersion": 1,
+        "proofInputDigestBoundSha": "0b27abd0c7d3e5fb82bfe1e720c683eeb7dec8e0"
       },
       "promotionHold": {
         "active": true,
@@ -193,7 +258,20 @@
         "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
         "verifiedAt": "2026-07-11T19:05:16Z",
         "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-NEAR-COMPLETE-TICK030/verification/consultant-mcp-tip-differential.json",
-        "notes": "FINISH-LINE-NEAR-COMPLETE-TICK030: main-bound differential_green at tip 0b27abd0c7d3 (23 cases tools|stdio|http). state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013)."
+        "notes": "FINISH-LINE-NEAR-COMPLETE-TICK030: main-bound differential_green at tip 0b27abd0c7d3 (23 cases tools|stdio|http). state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013).",
+        "proofInputDigest": "7e7b0dd643afb18aa5bded417f9b669789fefe03764361a8fd511a6cb07293ec",
+        "proofInputDigestFields": {
+          "tsClosure": "b97ea0eb026a6bf044677a25b274b37455d4ff1fa2446b408520533556c5ac65",
+          "rustClosure": "12417d70af1a109dd199f957a20e5eeea01d16241faaf7f6f84f24718b96e2be",
+          "contracts": null,
+          "config": null,
+          "deps": null,
+          "fixtures": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+          "harness": "974f9be6c54bf91c6fbf966d7c5973dad9ae8f475513ed2f03734e5302a7badc",
+          "deploySpecs": null
+        },
+        "proofInputDigestVersion": 1,
+        "proofInputDigestBoundSha": "0b27abd0c7d3e5fb82bfe1e720c683eeb7dec8e0"
       },
       "promotionHold": {
         "active": true,
