@@ -79,9 +79,9 @@
     },
     {
       "type": "api",
-      "name": "MCP server entry point",
-      "path": "src/server.ts",
-      "description": "Stdio server implementation that exposes the typed consultant tools."
+      "name": "Rust MCP server entry point",
+      "path": "crates/consultant-mcp-server/src/main.rs",
+      "description": "Rust rmcp stdio/HTTP server that exposes the typed consultant tools."
     },
     {
       "type": "docs",

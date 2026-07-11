@@ -35,6 +35,8 @@ Also smoke the package entry point without provider credentials:
 ```bash
 tmp=$(mktemp -d)
 npm install --prefix "$tmp" @sylphx/consultant-mcp@$(npm view @sylphx/consultant-mcp version)
+pkg_root="$tmp/node_modules/@sylphx/consultant-mcp"
+test -x "$pkg_root/bin/native/consultant-mcp-server"
 CONSULTANT_MOCK=true timeout 5s "$tmp/node_modules/.bin/sylphx-consultant-mcp" || test $? -eq 124
 rm -rf "$tmp"
 ```

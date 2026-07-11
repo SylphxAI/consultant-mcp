@@ -32,6 +32,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Build and stage Rust MCP server for npm packaging
+        run: npm run build:rust
+
       - name: Verify package
         run: npm run verify
 
@@ -114,6 +119,8 @@ jobs:
           set -euo pipefail
           tmp=$(mktemp -d)
           npm install --prefix "$tmp" "${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}"
+          pkg_root="$tmp/node_modules/${{ steps.pkg.outputs.name }}"
+          test -x "$pkg_root/bin/native/consultant-mcp-server"
           set +e
           CONSULTANT_MOCK=true timeout 5s "$tmp/node_modules/.bin/sylphx-consultant-mcp"
           status=$?

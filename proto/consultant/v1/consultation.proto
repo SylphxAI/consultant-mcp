@@ -1,0 +1,147 @@
+syntax = "proto3";
+
+package consultant.v1;
+
+// Cross-boundary SSOT for Consultant MCP tool inputs and shared result shape.
+// MCP tool JSON schemas and Rust/TS handlers are derived from this contract.
+
+enum PrivacyClass {
+  PRIVACY_CLASS_UNSPECIFIED = 0;
+  PRIVACY_CLASS_PUBLIC = 1;
+  PRIVACY_CLASS_INTERNAL = 2;
+  PRIVACY_CLASS_CONFIDENTIAL = 3;
+}
+
+enum ConsultationKind {
+  CONSULTATION_KIND_UNSPECIFIED = 0;
+  CONSULTATION_KIND_REVIEW_DECISION = 1;
+  CONSULTATION_KIND_RESEARCH = 2;
+  CONSULTATION_KIND_CHALLENGE_ANSWER = 3;
+  CONSULTATION_KIND_COMPARE_OPTIONS = 4;
+}
+
+enum ConsultationStatus {
+  CONSULTATION_STATUS_UNSPECIFIED = 0;
+  CONSULTATION_STATUS_COMPLETED = 1;
+  CONSULTATION_STATUS_BLOCKED = 2;
+  CONSULTATION_STATUS_FAILED = 3;
+}
+
+enum Verdict {
+  VERDICT_UNSPECIFIED = 0;
+  VERDICT_STRONG_ACCEPT = 1;
+  VERDICT_ACCEPT_WITH_CHANGES = 2;
+  VERDICT_NEEDS_MORE_EVIDENCE = 3;
+  VERDICT_REJECT = 4;
+}
+
+enum BudgetStatus {
+  BUDGET_STATUS_UNSPECIFIED = 0;
+  BUDGET_STATUS_OK = 1;
+  BUDGET_STATUS_REQUIRES_APPROVAL = 2;
+  BUDGET_STATUS_BLOCKED = 3;
+}
+
+message BudgetPolicy {
+  optional double max_usd = 1;
+  optional int32 max_latency_ms = 2;
+  optional double require_approval_over_usd = 3;
+}
+
+message EvidenceRef {
+  string type = 1;
+  optional string ref = 2;
+  string summary = 3;
+}
+
+message ConsultationInputBase {
+  optional string title = 1;
+  string context = 2;
+  repeated string constraints = 3;
+  PrivacyClass privacy_class = 4;
+  optional BudgetPolicy budget = 5;
+  string output_mode = 6;
+  repeated EvidenceRef current_evidence = 7;
+}
+
+message ReviewDecisionInput {
+  ConsultationInputBase base = 1;
+  string decision = 2;
+}
+
+message ResearchInput {
+  ConsultationInputBase base = 1;
+  string question = 2;
+  optional string scope = 3;
+}
+
+message ChallengeAnswerInput {
+  ConsultationInputBase base = 1;
+  string task = 2;
+  string proposed_answer = 3;
+}
+
+message CompareOptionsInput {
+  ConsultationInputBase base = 1;
+  string problem = 2;
+  repeated CompareOption options = 3;
+}
+
+message CompareOption {
+  string name = 1;
+  string description = 2;
+}
+
+message RecommendedChange {
+  string priority = 1;
+  string change = 2;
+  string rationale = 3;
+}
+
+message Citation {
+  string title = 1;
+  optional string url = 2;
+  optional string quote = 3;
+}
+
+message PanelModelResult {
+  string model = 1;
+  string role = 2;
+  bool ok = 3;
+  string content = 4;
+  int64 latency_ms = 5;
+  optional string error = 6;
+}
+
+message PolicyTrace {
+  PrivacyClass privacy_class = 1;
+  bool redaction_applied = 2;
+  BudgetStatus budget_status = 3;
+  double estimated_cost_usd = 4;
+}
+
+message ProviderTrace {
+  string provider = 1;
+  repeated string models = 2;
+  string judge_model = 3;
+  int64 latency_ms = 4;
+}
+
+message ConsultationResult {
+  string consultation_id = 1;
+  ConsultationKind kind = 2;
+  ConsultationStatus status = 3;
+  Verdict verdict = 4;
+  double confidence = 5;
+  string executive_summary = 6;
+  repeated string consensus = 7;
+  repeated string disagreements = 8;
+  repeated string blind_spots = 9;
+  repeated RecommendedChange recommended_changes = 10;
+  repeated string evidence_gaps = 11;
+  repeated string follow_up_questions = 12;
+  repeated Citation citations = 13;
+  repeated PanelModelResult panel = 14;
+  PolicyTrace policy = 15;
+  ProviderTrace provider_trace = 16;
+}

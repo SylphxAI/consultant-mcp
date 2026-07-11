@@ -1,0 +1,41 @@
+{
+  "review_decision": {
+    "kind": "review_decision",
+    "decision": "Expose typed Consultant MCP tools backed by a shared deliberation engine.",
+    "context": "Agents need high-quality design review without leaking secrets or spending unbounded budget.",
+    "privacyClass": "internal",
+    "constraints": ["Beta 0.x", "MCP compatible", "typed output"]
+  },
+  "research": {
+    "kind": "research",
+    "question": "What are best practices for MCP tool design with typed outputs?",
+    "context": "Building a beta consultant MCP package for autonomous agents.",
+    "privacyClass": "internal",
+    "constraints": ["Beta 0.x", "MCP compatible", "citation aware"]
+  },
+  "challenge_answer": {
+    "kind": "challenge_answer",
+    "task": "Recommend whether to use Rust or TypeScript for the MCP server core.",
+    "proposedAnswer": "Use TypeScript for speed of iteration in beta.",
+    "context": "Team is migrating consultant-mcp to Rust-first with parity proofs.",
+    "privacyClass": "internal",
+    "constraints": ["Beta 0.x", "production readiness"]
+  },
+  "compare_options": {
+    "kind": "compare_options",
+    "problem": "Choose the default MCP transport for consultant-mcp beta.",
+    "options": [
+      {
+        "name": "stdio-rust",
+        "description": "Rust rmcp stdio transport launched from npm bin."
+      },
+      {
+        "name": "http-rust",
+        "description": "Rust rmcp streamable HTTP on /mcp."
+      }
+    ],
+    "context": "Agents need reliable consultant tools with minimal ops overhead.",
+    "privacyClass": "internal",
+    "constraints": ["Beta 0.x", "MCP compatible"]
+  }
+}

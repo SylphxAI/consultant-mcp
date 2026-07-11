@@ -13,7 +13,7 @@ This beta implements a typed Model Context Protocol (MCP) server that lets agent
 3. `consultant.challenge_answer` — skeptical review of a proposed answer
 4. `consultant.compare_options` — option comparison and recommendation
 
-The package is intentionally production-shaped but small: TypeScript, MCP stdio, OpenRouter-compatible provider adapter, deterministic mock provider, policy gates, redaction, structured output, tests, ADR, and documentation.
+The package is intentionally production-shaped but small: Rust rmcp MCP transport, TypeScript schemas and engine library, OpenRouter-compatible provider adapter, deterministic mock provider, policy gates, redaction, structured output, tests, ADR, and documentation.
 
 ## Why this shape
 
@@ -35,7 +35,7 @@ MCP client / Sylphx agent
 
 ### Components
 
-- `src/server.ts` registers the four MCP tools.
+- `crates/consultant-mcp-server/` registers the four MCP tools over Rust rmcp stdio/HTTP.
 - `src/schemas.ts` owns tool input/output schemas.
 - `src/engine.ts` owns fan-out, judge synthesis, failure fallback, and result assembly.
 - `src/policy.ts` owns secret-like redaction, privacy blocking, cost estimate, and request hashing.

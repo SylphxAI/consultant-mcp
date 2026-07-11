@@ -1,0 +1,184 @@
+{
+  "corpusVersion": 1,
+  "transportContractCases": [
+    {
+      "id": "transport-default-stdio",
+      "env": {},
+      "expect": { "transport": "stdio" }
+    },
+    {
+      "id": "transport-mcp-http",
+      "env": { "MCP_TRANSPORT": "http" },
+      "expect": { "transport": "http" }
+    },
+    {
+      "id": "transport-consultant-http",
+      "env": { "CONSULTANT_MCP_TRANSPORT": "http" },
+      "expect": { "transport": "http" }
+    },
+    {
+      "id": "transport-consultant-precedence",
+      "env": {
+        "CONSULTANT_MCP_TRANSPORT": "stdio",
+        "MCP_TRANSPORT": "http"
+      },
+      "expect": { "transport": "stdio" }
+    }
+  ],
+  "surfaceContractCases": [
+    {
+      "id": "surface-bin-rmcp",
+      "surface": "bin",
+      "markers": ["resolve_rust_bin", "resolve_transport", "MCP_TRANSPORT=http"]
+    },
+    {
+      "id": "surface-stdio-rmcp",
+      "surface": "stdio",
+      "markers": ["stdio_transport::serve_stdio", "http_transport::transport_from_env"]
+    },
+    {
+      "id": "surface-stdio-module-rmcp",
+      "surface": "stdioModule",
+      "markers": ["transport::stdio", "serve_stdio"]
+    },
+    {
+      "id": "surface-http-rmcp",
+      "surface": "http",
+      "markers": ["StreamableHttpService", "health_check", "serve_http"]
+    }
+  ],
+  "toolCases": [
+    {
+      "id": "tool-review-decision",
+      "tool": "consultant.review_decision",
+      "requestKey": "review_decision",
+      "fixture": "review_decision_mock.json"
+    },
+    {
+      "id": "tool-research",
+      "tool": "consultant.research",
+      "requestKey": "research",
+      "fixture": "research_mock.json"
+    },
+    {
+      "id": "tool-challenge-answer",
+      "tool": "consultant.challenge_answer",
+      "requestKey": "challenge_answer",
+      "fixture": "challenge_answer_mock.json"
+    },
+    {
+      "id": "tool-compare-options",
+      "tool": "consultant.compare_options",
+      "requestKey": "compare_options",
+      "fixture": "compare_options_mock.json"
+    }
+  ],
+  "stdioProbeCases": [
+    {
+      "id": "stdio-initialize",
+      "kind": "initialize",
+      "expect": { "serverName": "sylphx-consultant-mcp" }
+    },
+    {
+      "id": "stdio-tools-list",
+      "kind": "toolsList",
+      "expect": {
+        "tools": [
+          "consultant.review_decision",
+          "consultant.research",
+          "consultant.challenge_answer",
+          "consultant.compare_options"
+        ]
+      }
+    },
+    {
+      "id": "stdio-review-decision",
+      "kind": "toolCall",
+      "tool": "consultant.review_decision",
+      "requestKey": "review_decision",
+      "expect": {
+        "kind": "review_decision",
+        "status": "completed",
+        "verdict": "accept_with_changes"
+      }
+    },
+    {
+      "id": "stdio-research",
+      "kind": "toolCall",
+      "tool": "consultant.research",
+      "requestKey": "research",
+      "expect": {
+        "kind": "research",
+        "status": "completed",
+        "verdict": "accept_with_changes"
+      }
+    },
+    {
+      "id": "stdio-challenge-answer",
+      "kind": "toolCall",
+      "tool": "consultant.challenge_answer",
+      "requestKey": "challenge_answer",
+      "expect": {
+        "kind": "challenge_answer",
+        "status": "completed",
+        "verdict": "accept_with_changes"
+      }
+    },
+    {
+      "id": "stdio-compare-options",
+      "kind": "toolCall",
+      "tool": "consultant.compare_options",
+      "requestKey": "compare_options",
+      "expect": {
+        "kind": "compare_options",
+        "status": "completed",
+        "verdict": "accept_with_changes"
+      }
+    }
+  ],
+  "httpProbeCases": [
+    {
+      "id": "http-health",
+      "kind": "health",
+      "path": "/health",
+      "expect": { "status": "ok" }
+    },
+    {
+      "id": "http-initialize",
+      "kind": "initialize",
+      "expect": { "serverName": "sylphx-consultant-mcp" }
+    },
+    {
+      "id": "http-tools-list",
+      "kind": "toolsList",
+      "expect": {
+        "tools": [
+          "consultant.review_decision",
+          "consultant.research",
+          "consultant.challenge_answer",
+          "consultant.compare_options"
+        ]
+      }
+    },
+    {
+      "id": "http-review-decision",
+      "kind": "toolCall",
+      "tool": "consultant.review_decision",
+      "requestKey": "review_decision",
+      "expect": {
+        "kind": "review_decision",
+        "status": "completed",
+        "verdict": "accept_with_changes"
+      }
+    }
+  ],
+  "serverContract": {
+    "name": "sylphx-consultant-mcp",
+    "tools": [
+      "consultant.review_decision",
+      "consultant.research",
+      "consultant.challenge_answer",
+      "consultant.compare_options"
+    ]
+  }
+}
