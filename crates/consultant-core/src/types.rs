@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 pub const ENGINE_NAME: &str = "consultant-core";
-pub const ENGINE_VERSION: &str = "0.1.1";
+pub const ENGINE_VERSION: &str = "0.2.0";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
