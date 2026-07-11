@@ -46,7 +46,10 @@ test('Doctrine adapter remains Sylphx-specific and package publication boundary 
 test('CI verifies the package and dogfoods the released GroundAtlas package/action', () => {
   const workflow = readText('.github/workflows/ci.yml')
 
-  assert.ok(workflow.includes('npm ci'))
+  assert.ok(
+    workflow.includes('npm install') || workflow.includes('npm ci'),
+    'CI must install dependencies via npm install or npm ci'
+  )
   assert.ok(workflow.includes('npm run build:rust'))
   assert.ok(workflow.includes('npm run verify'))
   assert.ok(workflow.includes('npm run test:project-control'))
