@@ -47,6 +47,7 @@ test('CI verifies the package and dogfoods the released GroundAtlas package/acti
   const workflow = readText('.github/workflows/ci.yml')
 
   assert.ok(workflow.includes('npm ci'))
+  assert.ok(workflow.includes('npm run build:rust'))
   assert.ok(workflow.includes('npm run verify'))
   assert.ok(workflow.includes('npm run test:project-control'))
   assert.ok(workflow.includes('uses: SylphxAI/groundatlas@v0.1.3'))
@@ -62,7 +63,13 @@ test('CI verifies the package and dogfoods the released GroundAtlas package/acti
 test('package scripts expose reproducible local gates and protected publication metadata', () => {
   const pkg = readJson('package.json')
 
-  assert.equal(pkg.scripts.verify, 'npm run typecheck && npm test && npm run build && npm run pack:beta')
+  assert.equal(
+    pkg.scripts.verify,
+    'npm run typecheck && npm test && npm run build && npm run test:rust && npm run test:parity && npm run test:http-transport && npm run pack:beta'
+  )
+  assert.equal(pkg.scripts['check:native-packaging'], 'bash scripts/check-native-packaging.sh')
+  assert.equal(pkg.scripts.prepublishOnly, 'npm run build:rust')
+  assert.ok(pkg.files.includes('bin/native'))
   assert.equal(pkg.scripts['test:project-control'], 'node --test test/project-control.node-test.mjs')
   assert.equal(
     pkg.scripts['groundatlas:fleet'],
@@ -86,8 +93,11 @@ test('release workflow uses protected Sylphx npm publication path', () => {
   assert.ok(workflow.includes('runs-on: ubuntu-latest'))
   assert.ok(workflow.includes('id-token: write'))
   assert.ok(workflow.includes('npm install --global npm@^11.5.1'))
+  assert.ok(workflow.includes('dtolnay/rust-toolchain@stable'))
+  assert.ok(workflow.includes('npm run build:rust'))
   assert.ok(workflow.includes('npm run verify'))
   assert.ok(workflow.includes('npm run test:project-control'))
+  assert.ok(workflow.includes('bin/native/consultant-mcp-server'))
   assert.ok(workflow.includes('npm exec --yes --package groundatlas@0.1.3 -- ga update --out .groundatlas-pilot'))
   assert.ok(workflow.includes('npm exec --yes --package groundatlas@0.1.3 -- ga manifest --out .groundatlas-pilot --json'))
   assert.ok(workflow.includes('npm exec --yes --package groundatlas@0.1.3 -- ga audit --out .groundatlas-pilot'))

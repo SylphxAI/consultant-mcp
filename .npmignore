@@ -1,0 +1,21 @@
+# Allowlist is package.json "files". Explicitly do NOT ignore staged native binary.
+node_modules/
+target/
+*.tgz
+artifacts/
+.env
+.env.*
+coverage/
+.vitest/
+.groundatlas*/
+src/
+crates/
+test/
+scripts/
+proto/
+.github/
+Cargo.toml
+Cargo.lock
+tsconfig.json
+biome.json
+buf.yaml

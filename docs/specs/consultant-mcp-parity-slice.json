@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "repo": "SylphxAI/consultant-mcp",
+  "slice": "consultant-mcp.tools|transport.stdio|transport.http",
+  "differentialHarness": "scripts/run-consultant-mcp-differential.sh",
+  "oracle": "scripts/differential/consultant-mcp-oracle.ts",
+  "behaviorSpec": "scripts/differential/fixtures/consultant-mcp-corpus.json",
+  "differentialTest": "crates/consultant-core/tests/consultant_mcp_differential.rs#consultant_mcp_differential_matches_ts_oracle",
+  "domains": [
+    {
+      "id": "tool/consultant.review_decision",
+      "differentialTest": true,
+      "fixture": "test/fixtures/golden/review_decision_mock.json"
+    },
+    {
+      "id": "tool/consultant.research",
+      "differentialTest": true,
+      "fixture": "test/fixtures/golden/research_mock.json"
+    },
+    {
+      "id": "tool/consultant.challenge_answer",
+      "differentialTest": true,
+      "fixture": "test/fixtures/golden/challenge_answer_mock.json"
+    },
+    {
+      "id": "tool/consultant.compare_options",
+      "differentialTest": true,
+      "fixture": "test/fixtures/golden/compare_options_mock.json"
+    },
+    {
+      "id": "transport/stdio-rust-rmcp",
+      "differentialTest": true,
+      "contract": "transportContract|surfaceContract.stdio|stdioProbe.initialize|stdioProbe.toolsList|stdioProbe.toolCall"
+    },
+    {
+      "id": "transport/web-mcp-http",
+      "differentialTest": true,
+      "contract": "transportContract|surfaceContract.http|httpProbe.health|httpProbe.initialize|httpProbe.toolsList|httpProbe.toolCall"
+    }
+  ]
+}

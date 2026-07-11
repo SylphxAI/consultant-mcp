@@ -1,0 +1,11 @@
+[workspace]
+members = [
+    "crates/consultant-core",
+    "crates/consultant-mcp-server",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.1"
+edition = "2021"
+license = "MIT"

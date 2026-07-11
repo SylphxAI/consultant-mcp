@@ -40,8 +40,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Build and stage Rust MCP server for npm packaging
+        run: npm run build:rust
+
       - name: Verify package
         run: npm run verify
+
+      - name: Rust clippy (no warnings)
+        run: cargo clippy --all-targets -- -D warnings
 
       - name: Test project-control boundary
         run: npm run test:project-control

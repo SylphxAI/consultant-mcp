@@ -42,7 +42,7 @@ ADR changes the lifecycle and boundary.
 
 - Package export: `package.json`
 - CLI binary: `sylphx-consultant-mcp`
-- MCP tool schemas and server: `src/schemas.ts`, `src/server.ts`
+- MCP tool schemas and Rust rmcp server: `src/schemas.ts`, `crates/consultant-mcp-server/`
 - Provider adapter boundary: `src/providers/`
 - Documentation and ADRs: `README.md`, `docs/`, `docs/adr/`, and `docs/specs/`
 - SOTA family roadmap: `docs/roadmap/sota-family-roadmap.md`
