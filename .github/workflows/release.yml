@@ -121,6 +121,10 @@ jobs:
           npm install --prefix "$tmp" "${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}"
           pkg_root="$tmp/node_modules/${{ steps.pkg.outputs.name }}"
           test -x "$pkg_root/bin/native/consultant-mcp-server"
+          test -x "$pkg_root/bin/sylphx-consultant-mcp"
+          # Consumer path is the npm .bin shim (often a symlink into the package).
+          # Launcher must resolve package-root natives through that symlink.
+          ls -la "$tmp/node_modules/.bin/sylphx-consultant-mcp" "$pkg_root/bin/sylphx-consultant-mcp" "$pkg_root/bin/native/consultant-mcp-server"
           set +e
           CONSULTANT_MOCK=true timeout 5s "$tmp/node_modules/.bin/sylphx-consultant-mcp"
           status=$?
