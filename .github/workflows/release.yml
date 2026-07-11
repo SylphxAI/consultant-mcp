@@ -123,17 +123,16 @@ jobs:
           test -x "$pkg_root/bin/native/consultant-mcp-server"
           test -x "$pkg_root/bin/sylphx-consultant-mcp"
           # Consumer path is the npm .bin shim (often a symlink into the package).
-          # Launcher must resolve package-root natives through that symlink.
           ls -la "$tmp/node_modules/.bin/sylphx-consultant-mcp" "$pkg_root/bin/sylphx-consultant-mcp" "$pkg_root/bin/native/consultant-mcp-server"
-          set +e
-          CONSULTANT_MOCK=true timeout 5s "$tmp/node_modules/.bin/sylphx-consultant-mcp"
-          status=$?
-          set -e
+          file "$pkg_root/bin/native/consultant-mcp-server" || true
+          # Bare stdio MCP exits 1 on immediate EOF ("connection closed: initialized request").
+          # Use the Rust binary's `doctor` subcommand for a fail-closed consumer-path smoke
+          # that still exercises the npm .bin → launcher → bin/native resolution chain.
+          out="$(CONSULTANT_MOCK=true "$tmp/node_modules/.bin/sylphx-consultant-mcp" doctor 2>&1)"
+          echo "$out"
+          echo "$out" | grep -E 'consultant-mcp Rust MCP server' >/dev/null
+          echo "$out" | grep -F "${{ steps.pkg.outputs.version }}" >/dev/null
           rm -rf "$tmp"
-          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
-            echo "Unexpected smoke exit code: $status" >&2
-            exit "$status"
-          fi
 
       - name: Create release tag
         if: steps.pkg.outputs.tag_exists == 'false'
