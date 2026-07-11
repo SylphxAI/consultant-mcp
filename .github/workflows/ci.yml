@@ -38,7 +38,9 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        # Platform optionalDeps are published with this package and may be
+        # missing from the registry / lockfile during self-build.
+        run: npm ci --omit=optional
 
       - uses: dtolnay/rust-toolchain@stable
         with:
