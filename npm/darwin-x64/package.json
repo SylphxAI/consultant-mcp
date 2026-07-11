@@ -1,0 +1,21 @@
+{
+  "name": "@sylphx/consultant-mcp-darwin-x64",
+  "version": "0.2.2",
+  "description": "Consultant MCP server native binary for darwin-x64",
+  "os": ["darwin"],
+  "cpu": ["x64"],
+  "files": ["consultant-mcp-server"],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SylphxAI/consultant-mcp.git",
+    "directory": "npm/darwin-x64"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

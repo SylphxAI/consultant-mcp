@@ -3,6 +3,8 @@ dist/
 target/
 bin/native/*
 !bin/native/.gitkeep
+# Platform package binaries are CI-assembled; keep package.json tracked
+npm/*/consultant-mcp-server
 *.tgz
 artifacts/
 .env
