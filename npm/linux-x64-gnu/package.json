@@ -1,0 +1,22 @@
+{
+  "name": "@sylphx/consultant-mcp-linux-x64-gnu",
+  "version": "0.2.2",
+  "description": "Consultant MCP server native binary for linux-x64-gnu",
+  "os": ["linux"],
+  "cpu": ["x64"],
+  "libc": ["glibc"],
+  "files": ["consultant-mcp-server"],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SylphxAI/consultant-mcp.git",
+    "directory": "npm/linux-x64-gnu"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

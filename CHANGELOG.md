@@ -1,5 +1,11 @@
 # @sylphx/consultant-mcp
 
+## 0.2.2
+
+### Patch Changes
+
+- Multi-arch native distribution via npm `optionalDependencies` platform packages (`darwin-arm64`, `darwin-x64`, `linux-x64-gnu`, `linux-arm64-gnu`) and arch-aware `bin/sylphx-consultant-mcp` resolver (optionalDep first, then staged `bin/native`, then cargo target). Fail-closed on wrong-arch natives via `file(1)`. Residual TS adapter remains explicit opt-in only (`CONSULTANT_MCP_TRANSPORT=ts`).
+
 ## 0.2.1
 
 ### Patch Changes

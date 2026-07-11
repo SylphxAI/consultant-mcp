@@ -15,7 +15,7 @@ use serde_json::Value;
 use std::sync::Arc;
 
 pub const SERVER_NAME: &str = "sylphx-consultant-mcp";
-pub const SERVER_VERSION: &str = "0.2.1";
+pub const SERVER_VERSION: &str = "0.2.2";
 pub const SERVER_INSTRUCTIONS: &str = "Sylphx Consultant MCP (Rust rmcp transport). Typed review, research, challenge, and compare tools backed by a shared deliberation engine.";
 
 #[derive(Clone)]

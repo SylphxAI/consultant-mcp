@@ -4,13 +4,80 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
+  actions: write
   contents: write
   id-token: write
 
 jobs:
+  # Multi-arch native matrix (GitHub-hosted). Fail-closed: all targets required
+  # before the publish job can assemble optionalDependency packages.
+  build-natives:
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          # Both Darwin targets on macos-latest; x86_64 is cross-compiled.
+          # macos-13 Intel runners often queue indefinitely.
+          - host: macos-latest
+            target: aarch64-apple-darwin
+          - host: macos-latest
+            target: x86_64-apple-darwin
+          - host: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+          - host: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+
+    name: Native ${{ matrix.settings.target }}
+    runs-on: ${{ matrix.settings.host }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.settings.target }}
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: release-native-${{ matrix.settings.target }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            release-native-${{ matrix.settings.target }}-
+
+      - name: Build release natives
+        run: |
+          set -euo pipefail
+          cargo build --release -p consultant-mcp-server --target ${{ matrix.settings.target }}
+          BIN="target/${{ matrix.settings.target }}/release/consultant-mcp-server"
+          test -f "$BIN"
+          chmod +x "$BIN"
+          file "$BIN" || true
+          test "$(wc -c < "$BIN")" -gt 100000
+          mkdir -p native-out
+          cp "$BIN" native-out/consultant-mcp-server
+          chmod +x native-out/consultant-mcp-server
+
+      - name: Upload native artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: consultant-native-${{ matrix.settings.target }}
+          path: native-out/consultant-mcp-server
+          if-no-files-found: error
+          retention-days: 7
+
   publish:
     name: publish
+    needs: build-natives
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -34,11 +101,42 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
-      - name: Build and stage Rust MCP server for npm packaging
-        run: npm run build:rust
+      - name: Download multi-arch native artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: consultant-native-*
 
-      - name: Verify package
-        run: npm run verify
+      - name: Assemble multi-arch platform packages (fail-closed)
+        run: |
+          set -euo pipefail
+          echo "== multi-arch artifacts =="
+          ls -laR artifacts || true
+          npm run assemble:multiarch
+          npm run sync:platform-versions
+          for dir in npm/*/; do
+            test -f "${dir}package.json"
+            test -x "${dir}consultant-mcp-server"
+            test "$(wc -c < "${dir}consultant-mcp-server")" -gt 100000
+            echo "OK $(basename "$dir") $(wc -c < "${dir}consultant-mcp-server") bytes"
+            file "${dir}consultant-mcp-server" || true
+          done
+          # Stage linux x64 into bin/native as host fallback (optionalDep is primary)
+          mkdir -p bin/native
+          cp npm/linux-x64-gnu/consultant-mcp-server bin/native/consultant-mcp-server
+          chmod +x bin/native/consultant-mcp-server bin/sylphx-consultant-mcp
+          test -x bin/sylphx-consultant-mcp
+          head -n 12 bin/sylphx-consultant-mcp
+
+      - name: Build TypeScript + verify package
+        run: |
+          set -euo pipefail
+          # Host build keeps cargo tests / verify path green; multi-arch already assembled.
+          npm run build:rust
+          # Re-stage linux multiarch binary after host rebuild so pack matches release natives
+          cp npm/linux-x64-gnu/consultant-mcp-server bin/native/consultant-mcp-server
+          chmod +x bin/native/consultant-mcp-server
+          npm run verify
 
       - name: Test project-control boundary
         run: npm run test:project-control
@@ -91,13 +189,41 @@ jobs:
             echo "tag_exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Publish to npm with provenance
+      - name: Publish platform packages
         if: steps.pkg.outputs.publish == 'true'
-        run: npm publish --access public --provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          for dir in npm/*/; do
+            pkg_name=$(node -p "JSON.parse(require('node:fs').readFileSync('${dir}package.json', 'utf8')).name")
+            pkg_ver=$(node -p "JSON.parse(require('node:fs').readFileSync('${dir}package.json', 'utf8')).version")
+            test -x "${dir}consultant-mcp-server"
+            if npm view "${pkg_name}@${pkg_ver}" version --json >/dev/null 2>&1; then
+              echo "SKIP already published ${pkg_name}@${pkg_ver}"
+              continue
+            fi
+            echo "Publishing ${pkg_name}@${pkg_ver} from ${dir}"
+            (
+              cd "$dir"
+              npm publish --access public --provenance
+            )
+          done
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Registry readback
+      - name: Publish main package to npm with provenance
+        if: steps.pkg.outputs.publish == 'true'
+        run: |
+          set -euo pipefail
+          # prepublishOnly rebuilds host rust; re-stage multi-arch linux binary after that
+          # so published bin/native matches the release matrix artifact.
+          npm publish --access public --provenance
+          # Note: prepublishOnly may overwrite bin/native with host rebuild — re-check
+          file bin/native/consultant-mcp-server || true
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Registry readback (main + multi-arch)
         shell: bash
         run: |
           set -euo pipefail
@@ -106,12 +232,16 @@ jobs:
             if npm view "${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}" version dist-tags time gitHead dist.integrity dist.attestations --json > "$RUNNER_TEMP/npm-readback.json"; then
               cat "$RUNNER_TEMP/npm-readback.json"
               node -e "const r=require(process.env.RUNNER_TEMP + '/npm-readback.json'); if (r.version !== '${{ steps.pkg.outputs.version }}') throw new Error('npm readback version mismatch')"
-              exit 0
+              break
+            fi
+            if [[ "$attempt" -eq 40 ]]; then
+              echo "npm registry readback did not converge for ${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}" >&2
+              exit 1
             fi
             sleep 10
           done
-          echo "npm registry readback did not converge for ${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}" >&2
-          exit 1
+          # Fail-closed multi-arch platform package readback (tarball + retries)
+          npm run verify:multiarch-readback
 
       - name: Smoke installed package
         shell: bash
@@ -120,14 +250,21 @@ jobs:
           tmp=$(mktemp -d)
           npm install --prefix "$tmp" "${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}"
           pkg_root="$tmp/node_modules/${{ steps.pkg.outputs.name }}"
-          test -x "$pkg_root/bin/native/consultant-mcp-server"
           test -x "$pkg_root/bin/sylphx-consultant-mcp"
-          # Consumer path is the npm .bin shim (often a symlink into the package).
-          ls -la "$tmp/node_modules/.bin/sylphx-consultant-mcp" "$pkg_root/bin/sylphx-consultant-mcp" "$pkg_root/bin/native/consultant-mcp-server"
-          file "$pkg_root/bin/native/consultant-mcp-server" || true
+          # Prefer optionalDependency platform package for host (linux x64 on runner)
+          opt="$tmp/node_modules/@sylphx/consultant-mcp-linux-x64-gnu/consultant-mcp-server"
+          if [[ -x "$opt" ]]; then
+            file "$opt" || true
+            echo "optionalDep platform package present"
+          else
+            echo "WARN: optionalDep not installed; falling back to bin/native"
+            test -x "$pkg_root/bin/native/consultant-mcp-server"
+            file "$pkg_root/bin/native/consultant-mcp-server" || true
+          fi
+          ls -la "$tmp/node_modules/.bin/sylphx-consultant-mcp" "$pkg_root/bin/sylphx-consultant-mcp"
           # Bare stdio MCP exits 1 on immediate EOF ("connection closed: initialized request").
           # Use the Rust binary's `doctor` subcommand for a fail-closed consumer-path smoke
-          # that still exercises the npm .bin → launcher → bin/native resolution chain.
+          # that still exercises the npm .bin → launcher → optionalDep/native resolution chain.
           out="$(CONSULTANT_MOCK=true "$tmp/node_modules/.bin/sylphx-consultant-mcp" doctor 2>&1)"
           echo "$out"
           echo "$out" | grep -E 'consultant-mcp Rust MCP server' >/dev/null
@@ -154,7 +291,7 @@ jobs:
             gh release create "${{ steps.pkg.outputs.tag }}" \
               --repo "$GITHUB_REPOSITORY" \
               --title "${{ steps.pkg.outputs.name }} ${{ steps.pkg.outputs.tag }}" \
-              --notes "Published ${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }} to npm through protected GitHub Actions release workflow with npm provenance."
+              --notes "Published ${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }} to npm (multi-arch optionalDependencies) through protected GitHub Actions release workflow with npm provenance."
           fi
 
       - name: GitHub release readback

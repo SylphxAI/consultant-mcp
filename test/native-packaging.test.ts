@@ -36,11 +36,15 @@ describe("native Rust packaging gate (S5 rej-010 rust_impl)", () => {
     expect(pkg.scripts.verify).toContain("pack:beta");
   });
 
-  it("bin wrapper resolves staged native binary before target/ fallbacks", () => {
+  it("bin wrapper is arch-aware and resolves optionalDep before staged native", () => {
     const bin = readText("bin/sylphx-consultant-mcp");
 
+    expect(bin).toContain("resolve_from_optional_dep");
+    expect(bin).toContain("@sylphx/consultant-mcp-darwin-arm64");
+    expect(bin).toContain("@sylphx/consultant-mcp-linux-x64-gnu");
+    expect(bin).toContain("is_runnable_native");
     expect(bin).toContain('"$ROOT/bin/native/consultant-mcp-server"');
-    expect(bin).toContain("Prebuilt Rust binary not found");
+    expect(bin).toContain("No runnable Rust MCP server");
     // Residual TS opt-in (CONSULTANT_MCP_TRANSPORT=ts) uses node dist/server.js — dual-path rust_impl.
     expect(bin).toContain("use_ts_transport");
     expect(bin).toContain("dist/server.js");
@@ -56,13 +60,42 @@ describe("native Rust packaging gate (S5 rej-010 rust_impl)", () => {
     );
   });
 
-  it("release workflow builds Rust before verify/publish", () => {
+  it("release workflow builds multi-arch natives then assembles before publish", () => {
     const workflow = readText(".github/workflows/release.yml");
 
     expect(workflow).toContain("dtolnay/rust-toolchain@stable");
     expect(workflow).toContain("npm run build:rust");
     expect(workflow).toContain("bin/native/consultant-mcp-server");
+    expect(workflow).toContain("assemble:multiarch");
+    expect(workflow).toContain("consultant-native-");
+    expect(workflow).toContain("Publish platform packages");
+    expect(workflow).toContain("verify:multiarch-readback");
   });
+
+  it("declares multi-arch optionalDependencies platform packages", () => {
+    const pkg = JSON.parse(readText("package.json")) as {
+      version: string;
+      optionalDependencies?: Record<string, string>;
+    };
+    const optional = pkg.optionalDependencies ?? {};
+    for (const name of [
+      "@sylphx/consultant-mcp-darwin-arm64",
+      "@sylphx/consultant-mcp-darwin-x64",
+      "@sylphx/consultant-mcp-linux-x64-gnu",
+      "@sylphx/consultant-mcp-linux-arm64-gnu",
+    ]) {
+      expect(optional[name]).toBe(pkg.version);
+      const platformKey = name.replace("@sylphx/consultant-mcp-", "");
+      const platformPkg = JSON.parse(
+        readText(`npm/${platformKey}/package.json`)
+      ) as { name: string; version: string; os: string[]; cpu: string[] };
+      expect(platformPkg.name).toBe(name);
+      expect(platformPkg.version).toBe(pkg.version);
+      expect(platformPkg.os.length).toBeGreaterThan(0);
+      expect(platformPkg.cpu.length).toBeGreaterThan(0);
+    }
+  });
+
 
   it("migration ledger keeps stdio transport at rust_impl with packaging prod probe", () => {
     const ledger = JSON.parse(
