@@ -59,6 +59,22 @@ fn run_ts_oracle() -> OracleCorpus {
     }
 
     let script = repo_root().join("scripts/differential/consultant-mcp-oracle.ts");
+    assert!(
+        script.is_file(),
+        "missing TS oracle script at {}",
+        script.display()
+    );
+    // Prefer harness path: set CONSULTANT_MCP_ORACLE_JSON after `bun run` oracle.
+    // Direct bun spawn is for local/CI differential workflow only.
+    let bun_ok = Command::new("bun")
+        .arg("--version")
+        .output()
+        .map(|o| o.status.success())
+        .unwrap_or(false);
+    assert!(
+        bun_ok,
+        "bun required to spawn TS oracle (or set CONSULTANT_MCP_ORACLE_JSON).          Use scripts/run-consultant-mcp-differential.sh — not plain cargo test."
+    );
     let output = Command::new("bun")
         .arg("run")
         .arg(&script)

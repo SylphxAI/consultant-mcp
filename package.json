@@ -33,7 +33,7 @@
     "build:rust": "cargo build --release -p consultant-core -p consultant-mcp-server && tsx scripts/stage-rust-mcp.ts",
     "check:native-packaging": "bash scripts/check-native-packaging.sh",
     "prepublishOnly": "npm run build:rust",
-    "test:rust": "cargo test",
+    "test:rust": "cargo test -p consultant-core --lib && cargo test -p consultant-mcp-server",
     "test:parity": "vitest run test/parity.test.ts && cargo test -p consultant-core parity -- --nocapture",
     "test:http-transport": "vitest run test/integration/http-transport.test.ts",
     "check:no-ts-http-backend": "bash scripts/check-no-ts-http-backend.sh",
