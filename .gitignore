@@ -1,7 +1,8 @@
 node_modules/
 dist/
 target/
-bin/native/
+bin/native/*
+!bin/native/.gitkeep
 *.tgz
 artifacts/
 .env

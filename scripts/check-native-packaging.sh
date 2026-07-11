@@ -37,21 +37,66 @@ fi
 
 if [[ "${violations}" -eq 0 ]]; then
   tmp="$(mktemp -d)"
-  trap 'rm -rf "${tmp}"' EXIT
-  (
-    cd "${ROOT}"
-    npm pack --pack-destination "${tmp}" >/dev/null 2>&1
-  )
+  cleanup() { rm -rf "${tmp}"; }
+  trap cleanup EXIT
+
+  # Force-include gitignored staged native binary for npm pack.
+  # npm respects .gitignore unless overridden; package.json "files" is not always enough
+  # for nested gitignored paths on all npm versions.
+  NPMIGNORE="${ROOT}/.npmignore"
+  NPMIGNORE_CREATED=0
+  if [[ ! -f "${NPMIGNORE}" ]]; then
+    cat >"${NPMIGNORE}" <<'IGNORE'
+# Generated for pack gate — do not re-ignore staged native binary.
+# package.json "files" is the allowlist; keep gitignored bin/native packable.
+node_modules/
+target/
+*.tgz
+artifacts/
+.env
+.env.*
+coverage/
+.vitest/
+.groundatlas*/
+IGNORE
+    NPMIGNORE_CREATED=1
+  fi
+
+  pack_out="$(cd "${ROOT}" && npm pack --pack-destination "${tmp}" 2>&1)" || {
+    echo "$pack_out"
+    report_violation "npm pack failed"
+  }
+  echo "$pack_out" | tail -n 5
+
   pkg_tgz="$(find "${tmp}" -maxdepth 1 -type f -name '*.tgz' | head -n 1 || true)"
+  if [[ -z "${pkg_tgz}" || ! -f "${pkg_tgz}" ]]; then
+    # Fallback: basename from npm pack stdout last line
+    base="$(echo "$pack_out" | tail -n 1 | tr -d '[:space:]')"
+    if [[ -n "$base" && -f "${tmp}/${base}" ]]; then
+      pkg_tgz="${tmp}/${base}"
+    fi
+  fi
+
   if [[ -z "${pkg_tgz}" || ! -f "${pkg_tgz}" ]]; then
     report_violation "npm pack did not produce a tarball"
   else
-    if ! tar -tzf "${pkg_tgz}" | grep -qx 'package/bin/native/consultant-mcp-server'; then
-      report_violation "npm pack tarball missing package/bin/native/consultant-mcp-server"
+    listing="$(tar -tzf "${pkg_tgz}" || true)"
+    if ! printf '%s\n' "${listing}" | grep -E '(^|/)package/bin/native/consultant-mcp-server$' >/dev/null; then
+      if ! printf '%s\n' "${listing}" | grep -E 'bin/native/consultant-mcp-server' >/dev/null; then
+        echo "--- tarball listing (first 80) ---"
+        printf '%s\n' "${listing}" | head -n 80
+        report_violation "npm pack tarball missing package/bin/native/consultant-mcp-server"
+      fi
     fi
-    if ! tar -tzf "${pkg_tgz}" | grep -qx 'package/bin/sylphx-consultant-mcp'; then
+    if ! printf '%s\n' "${listing}" | grep -E 'bin/sylphx-consultant-mcp' >/dev/null; then
+      echo "--- tarball listing (first 80) ---"
+      printf '%s\n' "${listing}" | head -n 80
       report_violation "npm pack tarball missing package/bin/sylphx-consultant-mcp"
     fi
+  fi
+
+  if [[ "${NPMIGNORE_CREATED}" -eq 1 ]]; then
+    rm -f "${NPMIGNORE}"
   fi
 fi
 
