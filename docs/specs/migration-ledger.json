@@ -32,14 +32,14 @@
       "proof": {
         "status": "differential_green",
         "baselineTsSha": "47b246ba7239c85053e2f0a79f888fbaf814c9e0",
-        "rustCandidateSha": "215388f970002947e5bf6df5c6368d913389d796",
-        "lastComparedMainSha": "215388f970002947e5bf6df5c6368d913389d796",
-        "mergeGroupSha": "215388f970002947e5bf6df5c6368d913389d796",
+        "rustCandidateSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
+        "lastComparedMainSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
+        "mergeGroupSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
         "behaviorSpecHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
         "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
-        "verifiedAt": "2026-07-11T21:17:39Z",
-        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-MCP-PAIR-TICK032/verification/consultant-mcp-tip-differential.json",
-        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013).",
+        "verifiedAt": "2026-07-11T23:17:59+01:00",
+        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/STALE-GREEN-PROOF-REBIND-TICK033/verification/consultant-mcp-tip-differential.json",
+        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013). | STALE-GREEN-PROOF-REBIND-TICK033: tip-rebind at live main after TICK032 finish-line merge; differential reconfirm green (cases=23 httpProbe=4); lastCompared/mergeGroup/rustCandidate watermarked; proofInputDigest restamped; NO new ts_deleted/authority.",
         "proofInputDigest": "0bd239eb433dac13013ca0f3d4de794347391c78860a846a11eaa23b43cc26a0",
         "proofInputDigestFields": {
           "tsClosure": null,
@@ -52,7 +52,7 @@
           "deploySpecs": "2d98dad88534a8f9cfc332364aa0fa0a98f47480b22905c8dc669803122a3eee"
         },
         "proofInputDigestVersion": 1,
-        "proofInputDigestBoundSha": "215388f970002947e5bf6df5c6368d913389d796"
+        "proofInputDigestBoundSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2"
       },
       "promotionHold": {
         "active": true,
@@ -74,14 +74,14 @@
       "proof": {
         "status": "differential_green",
         "baselineTsSha": "47b246ba7239c85053e2f0a79f888fbaf814c9e0",
-        "rustCandidateSha": "215388f970002947e5bf6df5c6368d913389d796",
-        "lastComparedMainSha": "215388f970002947e5bf6df5c6368d913389d796",
-        "mergeGroupSha": "215388f970002947e5bf6df5c6368d913389d796",
+        "rustCandidateSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
+        "lastComparedMainSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
+        "mergeGroupSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
         "behaviorSpecHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
         "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
-        "verifiedAt": "2026-07-11T21:17:39Z",
-        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-MCP-PAIR-TICK032/verification/consultant-mcp-tip-differential.json",
-        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013).",
+        "verifiedAt": "2026-07-11T23:17:59+01:00",
+        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/STALE-GREEN-PROOF-REBIND-TICK033/verification/consultant-mcp-tip-differential.json",
+        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013). | STALE-GREEN-PROOF-REBIND-TICK033: tip-rebind at live main after TICK032 finish-line merge; differential reconfirm green (cases=23 httpProbe=4); lastCompared/mergeGroup/rustCandidate watermarked; proofInputDigest restamped; NO new ts_deleted/authority.",
         "proofInputDigest": "070899182f4f4067838bf0a6d1c2dde673435e137e75bfd615870e94c76eb1de",
         "proofInputDigestFields": {
           "tsClosure": null,
@@ -94,7 +94,7 @@
           "deploySpecs": "8477549420366280671f94434446fe14c9e9f175c4f7ff726d6f7b0895aa53f9"
         },
         "proofInputDigestVersion": 1,
-        "proofInputDigestBoundSha": "215388f970002947e5bf6df5c6368d913389d796"
+        "proofInputDigestBoundSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2"
       },
       "promotionHold": {
         "active": true,
@@ -125,14 +125,14 @@
       "proof": {
         "status": "differential_green",
         "baselineTsSha": "47b246ba7239c85053e2f0a79f888fbaf814c9e0",
-        "rustCandidateSha": "215388f970002947e5bf6df5c6368d913389d796",
-        "lastComparedMainSha": "215388f970002947e5bf6df5c6368d913389d796",
-        "mergeGroupSha": "215388f970002947e5bf6df5c6368d913389d796",
+        "rustCandidateSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
+        "lastComparedMainSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
+        "mergeGroupSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
         "behaviorSpecHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
         "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
-        "verifiedAt": "2026-07-11T21:17:39Z",
-        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-MCP-PAIR-TICK032/verification/consultant-mcp-tip-differential.json",
-        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013).",
+        "verifiedAt": "2026-07-11T23:17:59+01:00",
+        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/STALE-GREEN-PROOF-REBIND-TICK033/verification/consultant-mcp-tip-differential.json",
+        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013). | STALE-GREEN-PROOF-REBIND-TICK033: tip-rebind at live main after TICK032 finish-line merge; differential reconfirm green (cases=23 httpProbe=4); lastCompared/mergeGroup/rustCandidate watermarked; proofInputDigest restamped; NO new ts_deleted/authority.",
         "proofInputDigest": "7e7b0dd643afb18aa5bded417f9b669789fefe03764361a8fd511a6cb07293ec",
         "proofInputDigestFields": {
           "tsClosure": "b97ea0eb026a6bf044677a25b274b37455d4ff1fa2446b408520533556c5ac65",
@@ -145,7 +145,7 @@
           "deploySpecs": null
         },
         "proofInputDigestVersion": 1,
-        "proofInputDigestBoundSha": "215388f970002947e5bf6df5c6368d913389d796"
+        "proofInputDigestBoundSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2"
       },
       "promotionHold": {
         "active": true,
@@ -167,14 +167,14 @@
       "proof": {
         "status": "differential_green",
         "baselineTsSha": "47b246ba7239c85053e2f0a79f888fbaf814c9e0",
-        "rustCandidateSha": "215388f970002947e5bf6df5c6368d913389d796",
-        "lastComparedMainSha": "215388f970002947e5bf6df5c6368d913389d796",
-        "mergeGroupSha": "215388f970002947e5bf6df5c6368d913389d796",
+        "rustCandidateSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
+        "lastComparedMainSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
+        "mergeGroupSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
         "behaviorSpecHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
         "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
-        "verifiedAt": "2026-07-11T21:17:39Z",
-        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-MCP-PAIR-TICK032/verification/consultant-mcp-tip-differential.json",
-        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013).",
+        "verifiedAt": "2026-07-11T23:17:59+01:00",
+        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/STALE-GREEN-PROOF-REBIND-TICK033/verification/consultant-mcp-tip-differential.json",
+        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013). | STALE-GREEN-PROOF-REBIND-TICK033: tip-rebind at live main after TICK032 finish-line merge; differential reconfirm green (cases=23 httpProbe=4); lastCompared/mergeGroup/rustCandidate watermarked; proofInputDigest restamped; NO new ts_deleted/authority.",
         "proofInputDigest": "7e7b0dd643afb18aa5bded417f9b669789fefe03764361a8fd511a6cb07293ec",
         "proofInputDigestFields": {
           "tsClosure": "b97ea0eb026a6bf044677a25b274b37455d4ff1fa2446b408520533556c5ac65",
@@ -187,7 +187,7 @@
           "deploySpecs": null
         },
         "proofInputDigestVersion": 1,
-        "proofInputDigestBoundSha": "215388f970002947e5bf6df5c6368d913389d796"
+        "proofInputDigestBoundSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2"
       },
       "promotionHold": {
         "active": true,
@@ -209,14 +209,14 @@
       "proof": {
         "status": "differential_green",
         "baselineTsSha": "47b246ba7239c85053e2f0a79f888fbaf814c9e0",
-        "rustCandidateSha": "215388f970002947e5bf6df5c6368d913389d796",
-        "lastComparedMainSha": "215388f970002947e5bf6df5c6368d913389d796",
-        "mergeGroupSha": "215388f970002947e5bf6df5c6368d913389d796",
+        "rustCandidateSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
+        "lastComparedMainSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
+        "mergeGroupSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
         "behaviorSpecHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
         "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
-        "verifiedAt": "2026-07-11T21:17:39Z",
-        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-MCP-PAIR-TICK032/verification/consultant-mcp-tip-differential.json",
-        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013).",
+        "verifiedAt": "2026-07-11T23:17:59+01:00",
+        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/STALE-GREEN-PROOF-REBIND-TICK033/verification/consultant-mcp-tip-differential.json",
+        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013). | STALE-GREEN-PROOF-REBIND-TICK033: tip-rebind at live main after TICK032 finish-line merge; differential reconfirm green (cases=23 httpProbe=4); lastCompared/mergeGroup/rustCandidate watermarked; proofInputDigest restamped; NO new ts_deleted/authority.",
         "proofInputDigest": "7e7b0dd643afb18aa5bded417f9b669789fefe03764361a8fd511a6cb07293ec",
         "proofInputDigestFields": {
           "tsClosure": "b97ea0eb026a6bf044677a25b274b37455d4ff1fa2446b408520533556c5ac65",
@@ -229,7 +229,7 @@
           "deploySpecs": null
         },
         "proofInputDigestVersion": 1,
-        "proofInputDigestBoundSha": "215388f970002947e5bf6df5c6368d913389d796"
+        "proofInputDigestBoundSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2"
       },
       "promotionHold": {
         "active": true,
@@ -251,14 +251,14 @@
       "proof": {
         "status": "differential_green",
         "baselineTsSha": "47b246ba7239c85053e2f0a79f888fbaf814c9e0",
-        "rustCandidateSha": "215388f970002947e5bf6df5c6368d913389d796",
-        "lastComparedMainSha": "215388f970002947e5bf6df5c6368d913389d796",
-        "mergeGroupSha": "215388f970002947e5bf6df5c6368d913389d796",
+        "rustCandidateSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
+        "lastComparedMainSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
+        "mergeGroupSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
         "behaviorSpecHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
         "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
-        "verifiedAt": "2026-07-11T21:17:39Z",
-        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-MCP-PAIR-TICK032/verification/consultant-mcp-tip-differential.json",
-        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013).",
+        "verifiedAt": "2026-07-11T23:17:59+01:00",
+        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/STALE-GREEN-PROOF-REBIND-TICK033/verification/consultant-mcp-tip-differential.json",
+        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013). | STALE-GREEN-PROOF-REBIND-TICK033: tip-rebind at live main after TICK032 finish-line merge; differential reconfirm green (cases=23 httpProbe=4); lastCompared/mergeGroup/rustCandidate watermarked; proofInputDigest restamped; NO new ts_deleted/authority.",
         "proofInputDigest": "7e7b0dd643afb18aa5bded417f9b669789fefe03764361a8fd511a6cb07293ec",
         "proofInputDigestFields": {
           "tsClosure": "b97ea0eb026a6bf044677a25b274b37455d4ff1fa2446b408520533556c5ac65",
@@ -271,7 +271,7 @@
           "deploySpecs": null
         },
         "proofInputDigestVersion": 1,
-        "proofInputDigestBoundSha": "215388f970002947e5bf6df5c6368d913389d796"
+        "proofInputDigestBoundSha": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2"
       },
       "promotionHold": {
         "active": true,
@@ -328,6 +328,19 @@
       "cases": 23,
       "promotions": false,
       "repoComplete": false
+    },
+    "lastProofRebind": {
+      "packet": "STALE-GREEN-PROOF-REBIND-TICK033",
+      "at": "2026-07-11T22:18:21Z",
+      "tip": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
+      "greenRebound": [
+        "tool/consultant.challenge_answer",
+        "tool/consultant.compare_options",
+        "tool/consultant.research",
+        "tool/consultant.review_decision",
+        "transport/stdio-rust-rmcp",
+        "transport/web-mcp-http"
+      ]
     }
   },
   "repoLedgerPath": "docs/specs/migration-ledger.json"
