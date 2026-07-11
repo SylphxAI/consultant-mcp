@@ -1,7 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# Resolve this script's directory even when npm installs a .bin symlink.
+resolve_bin_dir() {
+  local source="${BASH_SOURCE[0]}"
+  local dir
+  while [[ -L "$source" ]]; do
+    dir="$(cd -P "$(dirname "$source")" && pwd)"
+    source="$(readlink "$source")"
+    [[ "$source" != /* ]] && source="$dir/$source"
+  done
+  cd -P "$(dirname "$source")" && pwd
+}
+
+ROOT="$(cd "$(resolve_bin_dir)/.." && pwd)"
 TS_ENTRY="$ROOT/dist/server.js"
 
 resolve_rust_bin() {

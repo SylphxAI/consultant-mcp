@@ -1,5 +1,11 @@
 # @sylphx/consultant-mcp
 
+## 0.2.1
+
+### Patch Changes
+
+- Fix npm consumer launcher path resolution: follow `.bin` symlinks so `sylphx-consultant-mcp` locates staged `bin/native/consultant-mcp-server` after `npm install` (Release smoke for 0.2.0 failed closed on this).
+
 ## 0.2.0
 
 ### Minor Changes
