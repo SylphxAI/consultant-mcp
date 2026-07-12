@@ -28,7 +28,39 @@
       "rustSurface": "crates/consultant-mcp-server/src/http_transport.rs (rmcp StreamableHttpService)",
       "parityTest": "scripts/run-consultant-mcp-differential.sh; test/integration/http-transport.test.ts",
       "notes": "Rust rmcp streamable HTTP on /mcp + /mcp/health; rust_impl only (rej-010 \u2014 no authority_rust without main-bound differential_green).",
-      "prodProbe": "MCP_TRANSPORT=http /mcp/health via Rust streamable HTTP"
+      "prodProbe": "MCP_TRANSPORT=http /mcp/health via Rust streamable HTTP",
+      "proof": {
+        "status": "differential_green",
+        "baselineTsSha": "47b246ba7239c85053e2f0a79f888fbaf814c9e0",
+        "rustCandidateSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "lastComparedMainSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "mergeGroupSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "behaviorSpecHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+        "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+        "verifiedAt": "2026-07-12T01:07:46+01:00",
+        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-MCP-PASS-TICK035/verification/consultant-mcp-tip-differential.json",
+        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013). | STALE-GREEN-PROOF-REBIND-TICK033: tip-rebind at live main after TICK032 finish-line merge; differential reconfirm green (cases=23 httpProbe=4); lastCompared/mergeGroup/rustCandidate watermarked; proofInputDigest restamped; NO new ts_deleted/authority. | FINISH-LINE-MCP-PASS-TICK035: tip-rebind at live main; differential reconfirm green; lastCompared/mergeGroup/rustCandidate watermarked; NO new ts_deleted/authority (rej-010/011/013).",
+        "proofInputDigest": "0bd239eb433dac13013ca0f3d4de794347391c78860a846a11eaa23b43cc26a0",
+        "proofInputDigestFields": {
+          "tsClosure": null,
+          "rustClosure": "e32c15e1e56dddda500e3a75a326580e93d9d350dab2b261b12679e36e10b387",
+          "contracts": null,
+          "config": null,
+          "deps": null,
+          "fixtures": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+          "harness": "974f9be6c54bf91c6fbf966d7c5973dad9ae8f475513ed2f03734e5302a7badc",
+          "deploySpecs": "2d98dad88534a8f9cfc332364aa0fa0a98f47480b22905c8dc669803122a3eee"
+        },
+        "proofInputDigestVersion": 1,
+        "proofInputDigestBoundSha": "30a63aa52f5aa41dffe5315139b57d123747b112"
+      },
+      "promotionHold": {
+        "active": true,
+        "reason": "rej-010/013: differential_green at bound SHAs \u2014 promotion_hold; no authority/ts_deleted",
+        "rejectionRef": "rej-010",
+        "since": "2026-07-11T20:00:00Z"
+      },
+      "differentialTest": "crates/consultant-core/tests/consultant_mcp_differential.rs#consultant_mcp_differential_matches_ts_oracle"
     },
     {
       "id": "transport/stdio-rust-rmcp",
@@ -38,7 +70,39 @@
       "rustSurface": "crates/consultant-mcp-server/src/stdio_transport.rs (rmcp::transport::stdio())",
       "parityTest": "scripts/run-consultant-mcp-differential.sh; cargo test -p consultant-core --test consultant_mcp_differential",
       "notes": "Default bin prefers Rust rmcp stdio when native binary present; residual TS via CONSULTANT_MCP_TRANSPORT=ts. rust_impl only.",
-      "prodProbe": "npm run check:native-packaging; bin/native/consultant-mcp-server staged for npm pack"
+      "prodProbe": "npm run check:native-packaging; bin/native/consultant-mcp-server staged for npm pack",
+      "proof": {
+        "status": "differential_green",
+        "baselineTsSha": "47b246ba7239c85053e2f0a79f888fbaf814c9e0",
+        "rustCandidateSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "lastComparedMainSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "mergeGroupSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "behaviorSpecHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+        "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+        "verifiedAt": "2026-07-12T01:07:46+01:00",
+        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-MCP-PASS-TICK035/verification/consultant-mcp-tip-differential.json",
+        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013). | STALE-GREEN-PROOF-REBIND-TICK033: tip-rebind at live main after TICK032 finish-line merge; differential reconfirm green (cases=23 httpProbe=4); lastCompared/mergeGroup/rustCandidate watermarked; proofInputDigest restamped; NO new ts_deleted/authority. | FINISH-LINE-MCP-PASS-TICK035: tip-rebind at live main; differential reconfirm green; lastCompared/mergeGroup/rustCandidate watermarked; NO new ts_deleted/authority (rej-010/011/013).",
+        "proofInputDigest": "070899182f4f4067838bf0a6d1c2dde673435e137e75bfd615870e94c76eb1de",
+        "proofInputDigestFields": {
+          "tsClosure": null,
+          "rustClosure": "f3a848df58ff267fd2c572b7b4b4a6c87c4eba6a600b74f2361affac4a00ba23",
+          "contracts": null,
+          "config": null,
+          "deps": null,
+          "fixtures": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+          "harness": "974f9be6c54bf91c6fbf966d7c5973dad9ae8f475513ed2f03734e5302a7badc",
+          "deploySpecs": "8477549420366280671f94434446fe14c9e9f175c4f7ff726d6f7b0895aa53f9"
+        },
+        "proofInputDigestVersion": 1,
+        "proofInputDigestBoundSha": "30a63aa52f5aa41dffe5315139b57d123747b112"
+      },
+      "promotionHold": {
+        "active": true,
+        "reason": "rej-010/013: differential_green at bound SHAs \u2014 promotion_hold; no authority/ts_deleted",
+        "rejectionRef": "rej-010",
+        "since": "2026-07-11T20:00:00Z"
+      },
+      "differentialTest": "crates/consultant-core/tests/consultant_mcp_differential.rs#consultant_mcp_differential_matches_ts_oracle"
     },
     {
       "id": "transport/stdio-ts-adapter",
@@ -46,7 +110,8 @@
       "weight": 4,
       "state": "ts_only",
       "tsSurface": "src/server.ts",
-      "notes": "Residual TS stdio adapter retained (src/server.ts) as opt-in until differential_green + authority flip. Not ts_deleted (rej-010)."
+      "notes": "Residual TS stdio adapter retained (src/server.ts) as opt-in until differential_green + authority flip. Not ts_deleted (rej-010).",
+      "proof": {}
     },
     {
       "id": "tool/consultant.review_decision",
@@ -57,7 +122,39 @@
       "rustSurface": "crates/consultant-mcp-server/src/lib.rs",
       "protoRpc": "consultant.v1.ReviewDecisionInput",
       "parityTest": "test/fixtures/golden/review_decision_mock.json; cargo test -p consultant-core parity",
-      "notes": "Rust tool surface + golden fixture; main-bound differential harness co-landed \u2014 proof.status pending until CI green."
+      "notes": "Rust tool surface + golden fixture; main-bound differential harness co-landed \u2014 proof.status pending until CI green.",
+      "proof": {
+        "status": "differential_green",
+        "baselineTsSha": "47b246ba7239c85053e2f0a79f888fbaf814c9e0",
+        "rustCandidateSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "lastComparedMainSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "mergeGroupSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "behaviorSpecHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+        "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+        "verifiedAt": "2026-07-12T01:07:46+01:00",
+        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-MCP-PASS-TICK035/verification/consultant-mcp-tip-differential.json",
+        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013). | STALE-GREEN-PROOF-REBIND-TICK033: tip-rebind at live main after TICK032 finish-line merge; differential reconfirm green (cases=23 httpProbe=4); lastCompared/mergeGroup/rustCandidate watermarked; proofInputDigest restamped; NO new ts_deleted/authority. | FINISH-LINE-MCP-PASS-TICK035: tip-rebind at live main; differential reconfirm green; lastCompared/mergeGroup/rustCandidate watermarked; NO new ts_deleted/authority (rej-010/011/013).",
+        "proofInputDigest": "7e7b0dd643afb18aa5bded417f9b669789fefe03764361a8fd511a6cb07293ec",
+        "proofInputDigestFields": {
+          "tsClosure": "b97ea0eb026a6bf044677a25b274b37455d4ff1fa2446b408520533556c5ac65",
+          "rustClosure": "12417d70af1a109dd199f957a20e5eeea01d16241faaf7f6f84f24718b96e2be",
+          "contracts": null,
+          "config": null,
+          "deps": null,
+          "fixtures": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+          "harness": "974f9be6c54bf91c6fbf966d7c5973dad9ae8f475513ed2f03734e5302a7badc",
+          "deploySpecs": null
+        },
+        "proofInputDigestVersion": 1,
+        "proofInputDigestBoundSha": "30a63aa52f5aa41dffe5315139b57d123747b112"
+      },
+      "promotionHold": {
+        "active": true,
+        "reason": "rej-010/013: differential_green at bound SHAs \u2014 promotion_hold; no authority/ts_deleted",
+        "rejectionRef": "rej-010",
+        "since": "2026-07-11T20:00:00Z"
+      },
+      "differentialTest": "crates/consultant-core/tests/consultant_mcp_differential.rs#consultant_mcp_differential_matches_ts_oracle"
     },
     {
       "id": "tool/consultant.research",
@@ -67,7 +164,39 @@
       "tsSurface": "src/server.ts",
       "rustSurface": "crates/consultant-mcp-server/src/lib.rs",
       "protoRpc": "consultant.v1.ResearchInput",
-      "notes": "Rust tool surface shipped; differential corpus case present \u2014 rust_impl only."
+      "notes": "Rust tool surface shipped; differential corpus case present \u2014 rust_impl only.",
+      "proof": {
+        "status": "differential_green",
+        "baselineTsSha": "47b246ba7239c85053e2f0a79f888fbaf814c9e0",
+        "rustCandidateSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "lastComparedMainSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "mergeGroupSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "behaviorSpecHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+        "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+        "verifiedAt": "2026-07-12T01:07:46+01:00",
+        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-MCP-PASS-TICK035/verification/consultant-mcp-tip-differential.json",
+        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013). | STALE-GREEN-PROOF-REBIND-TICK033: tip-rebind at live main after TICK032 finish-line merge; differential reconfirm green (cases=23 httpProbe=4); lastCompared/mergeGroup/rustCandidate watermarked; proofInputDigest restamped; NO new ts_deleted/authority. | FINISH-LINE-MCP-PASS-TICK035: tip-rebind at live main; differential reconfirm green; lastCompared/mergeGroup/rustCandidate watermarked; NO new ts_deleted/authority (rej-010/011/013).",
+        "proofInputDigest": "7e7b0dd643afb18aa5bded417f9b669789fefe03764361a8fd511a6cb07293ec",
+        "proofInputDigestFields": {
+          "tsClosure": "b97ea0eb026a6bf044677a25b274b37455d4ff1fa2446b408520533556c5ac65",
+          "rustClosure": "12417d70af1a109dd199f957a20e5eeea01d16241faaf7f6f84f24718b96e2be",
+          "contracts": null,
+          "config": null,
+          "deps": null,
+          "fixtures": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+          "harness": "974f9be6c54bf91c6fbf966d7c5973dad9ae8f475513ed2f03734e5302a7badc",
+          "deploySpecs": null
+        },
+        "proofInputDigestVersion": 1,
+        "proofInputDigestBoundSha": "30a63aa52f5aa41dffe5315139b57d123747b112"
+      },
+      "promotionHold": {
+        "active": true,
+        "reason": "rej-010/013: differential_green at bound SHAs \u2014 promotion_hold; no authority/ts_deleted",
+        "rejectionRef": "rej-010",
+        "since": "2026-07-11T20:00:00Z"
+      },
+      "differentialTest": "crates/consultant-core/tests/consultant_mcp_differential.rs#consultant_mcp_differential_matches_ts_oracle"
     },
     {
       "id": "tool/consultant.challenge_answer",
@@ -77,7 +206,39 @@
       "tsSurface": "src/server.ts",
       "rustSurface": "crates/consultant-mcp-server/src/lib.rs",
       "protoRpc": "consultant.v1.ChallengeAnswerInput",
-      "notes": "Rust tool surface shipped; differential corpus case present \u2014 rust_impl only."
+      "notes": "Rust tool surface shipped; differential corpus case present \u2014 rust_impl only.",
+      "proof": {
+        "status": "differential_green",
+        "baselineTsSha": "47b246ba7239c85053e2f0a79f888fbaf814c9e0",
+        "rustCandidateSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "lastComparedMainSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "mergeGroupSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "behaviorSpecHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+        "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+        "verifiedAt": "2026-07-12T01:07:46+01:00",
+        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-MCP-PASS-TICK035/verification/consultant-mcp-tip-differential.json",
+        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013). | STALE-GREEN-PROOF-REBIND-TICK033: tip-rebind at live main after TICK032 finish-line merge; differential reconfirm green (cases=23 httpProbe=4); lastCompared/mergeGroup/rustCandidate watermarked; proofInputDigest restamped; NO new ts_deleted/authority. | FINISH-LINE-MCP-PASS-TICK035: tip-rebind at live main; differential reconfirm green; lastCompared/mergeGroup/rustCandidate watermarked; NO new ts_deleted/authority (rej-010/011/013).",
+        "proofInputDigest": "7e7b0dd643afb18aa5bded417f9b669789fefe03764361a8fd511a6cb07293ec",
+        "proofInputDigestFields": {
+          "tsClosure": "b97ea0eb026a6bf044677a25b274b37455d4ff1fa2446b408520533556c5ac65",
+          "rustClosure": "12417d70af1a109dd199f957a20e5eeea01d16241faaf7f6f84f24718b96e2be",
+          "contracts": null,
+          "config": null,
+          "deps": null,
+          "fixtures": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+          "harness": "974f9be6c54bf91c6fbf966d7c5973dad9ae8f475513ed2f03734e5302a7badc",
+          "deploySpecs": null
+        },
+        "proofInputDigestVersion": 1,
+        "proofInputDigestBoundSha": "30a63aa52f5aa41dffe5315139b57d123747b112"
+      },
+      "promotionHold": {
+        "active": true,
+        "reason": "rej-010/013: differential_green at bound SHAs \u2014 promotion_hold; no authority/ts_deleted",
+        "rejectionRef": "rej-010",
+        "since": "2026-07-11T20:00:00Z"
+      },
+      "differentialTest": "crates/consultant-core/tests/consultant_mcp_differential.rs#consultant_mcp_differential_matches_ts_oracle"
     },
     {
       "id": "tool/consultant.compare_options",
@@ -87,7 +248,39 @@
       "tsSurface": "src/server.ts",
       "rustSurface": "crates/consultant-mcp-server/src/lib.rs",
       "protoRpc": "consultant.v1.CompareOptionsInput",
-      "notes": "Rust tool surface shipped; differential corpus case present \u2014 rust_impl only."
+      "notes": "Rust tool surface shipped; differential corpus case present \u2014 rust_impl only.",
+      "proof": {
+        "status": "differential_green",
+        "baselineTsSha": "47b246ba7239c85053e2f0a79f888fbaf814c9e0",
+        "rustCandidateSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "lastComparedMainSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "mergeGroupSha": "30a63aa52f5aa41dffe5315139b57d123747b112",
+        "behaviorSpecHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+        "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+        "verifiedAt": "2026-07-12T01:07:46+01:00",
+        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-MCP-PASS-TICK035/verification/consultant-mcp-tip-differential.json",
+        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind differential_green at 215388f97000 (23 cases tools|stdio|http). proofInputDigest restamped. state remains rust_impl \u2014 NO parity_proven/authority_rust/ts_deleted (rej-010/011/013). | STALE-GREEN-PROOF-REBIND-TICK033: tip-rebind at live main after TICK032 finish-line merge; differential reconfirm green (cases=23 httpProbe=4); lastCompared/mergeGroup/rustCandidate watermarked; proofInputDigest restamped; NO new ts_deleted/authority. | FINISH-LINE-MCP-PASS-TICK035: tip-rebind at live main; differential reconfirm green; lastCompared/mergeGroup/rustCandidate watermarked; NO new ts_deleted/authority (rej-010/011/013).",
+        "proofInputDigest": "7e7b0dd643afb18aa5bded417f9b669789fefe03764361a8fd511a6cb07293ec",
+        "proofInputDigestFields": {
+          "tsClosure": "b97ea0eb026a6bf044677a25b274b37455d4ff1fa2446b408520533556c5ac65",
+          "rustClosure": "12417d70af1a109dd199f957a20e5eeea01d16241faaf7f6f84f24718b96e2be",
+          "contracts": null,
+          "config": null,
+          "deps": null,
+          "fixtures": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+          "harness": "974f9be6c54bf91c6fbf966d7c5973dad9ae8f475513ed2f03734e5302a7badc",
+          "deploySpecs": null
+        },
+        "proofInputDigestVersion": 1,
+        "proofInputDigestBoundSha": "30a63aa52f5aa41dffe5315139b57d123747b112"
+      },
+      "promotionHold": {
+        "active": true,
+        "reason": "rej-010/013: differential_green at bound SHAs \u2014 promotion_hold; no authority/ts_deleted",
+        "rejectionRef": "rej-010",
+        "since": "2026-07-11T20:00:00Z"
+      },
+      "differentialTest": "crates/consultant-core/tests/consultant_mcp_differential.rs#consultant_mcp_differential_matches_ts_oracle"
     }
   ],
   "summary": {
@@ -100,7 +293,56 @@
     "ts_deleted": 0,
     "completion_progress": 0.0,
     "authority_progress": 0.0,
-    "weighted_progress": 0.862
+    "weighted_progress": 0.862,
+    "proof_missing": 0,
+    "differential_green": 6,
+    "notes": "FINISH-LINE-MCP-PASS-TICK035: tip-bound differential_green\u00d76 at 30a63aa52f5a (cases=23 httpProbe=4). proofInputDigest restamped. ts_only adapter residual. NO promotions. NOT REPO_COMPLETE.",
+    "liveMainTip": "30a63aa52f5aa41dffe5315139b57d123747b112",
+    "lastMutation": "FINISH-LINE-MCP-PASS-TICK035",
+    "updatedAt": "2026-07-12T00:08:08Z",
+    "tick030_delta": {
+      "packetId": "FINISH-LINE-NEAR-COMPLETE-TICK030",
+      "differential_green_caps": [
+        "transport/web-mcp-http",
+        "transport/stdio-rust-rmcp",
+        "tool/consultant.review_decision",
+        "tool/consultant.research",
+        "tool/consultant.challenge_answer",
+        "tool/consultant.compare_options"
+      ],
+      "tip": "0b27abd0c7d3e5fb82bfe1e720c683eeb7dec8e0",
+      "cases": 23,
+      "promotions": false
+    },
+    "tick032_delta": {
+      "packetId": "FINISH-LINE-MCP-PAIR-TICK032",
+      "action": "lastCompared_tip_bind_plus_digest_restamp",
+      "differential_green_caps": [
+        "transport/web-mcp-http",
+        "transport/stdio-rust-rmcp",
+        "tool/consultant.review_decision",
+        "tool/consultant.research",
+        "tool/consultant.challenge_answer",
+        "tool/consultant.compare_options"
+      ],
+      "tip": "215388f970002947e5bf6df5c6368d913389d796",
+      "cases": 23,
+      "promotions": false,
+      "repoComplete": false
+    },
+    "lastProofRebind": {
+      "packet": "STALE-GREEN-PROOF-REBIND-TICK033",
+      "at": "2026-07-11T22:18:21Z",
+      "tip": "48cc59b5d6d306f3dab76b0338c51a198f1ba5e2",
+      "greenRebound": [
+        "tool/consultant.challenge_answer",
+        "tool/consultant.compare_options",
+        "tool/consultant.research",
+        "tool/consultant.review_decision",
+        "transport/stdio-rust-rmcp",
+        "transport/web-mcp-http"
+      ]
+    }
   },
   "repoLedgerPath": "docs/specs/migration-ledger.json"
 }
