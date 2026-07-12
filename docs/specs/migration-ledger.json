@@ -110,8 +110,7 @@
       "weight": 4,
       "state": "ts_only",
       "tsSurface": "src/server.ts",
-      "notes": "Residual TS stdio adapter retained (src/server.ts) as opt-in until differential_green + authority flip. Not ts_deleted (rej-010).",
-      "proof": {}
+      "notes": "Residual TS stdio adapter retained (src/server.ts) as opt-in until differential_green + authority flip. Not ts_deleted (rej-010)."
     },
     {
       "id": "tool/consultant.review_decision",
