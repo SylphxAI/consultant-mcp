@@ -45,3 +45,39 @@ pub fn judge_prompt(
         "{RUBRIC}\n\nYou are the judge synthesizer for a Sylphx Consultant MCP {kind_label} consultation.\nCompare the panel outputs. Identify consensus, disagreements, blind spots, evidence gaps, and final recommendation.\nReturn JSON only matching this shape:\n{{\n  \"verdict\": \"strong_accept|accept_with_changes|needs_more_evidence|reject\",\n  \"confidence\": 0.0,\n  \"executiveSummary\": \"...\",\n  \"consensus\": [\"...\"],\n  \"disagreements\": [\"...\"],\n  \"blindSpots\": [\"...\"],\n  \"recommendedChanges\": [{{\"priority\":\"must|should|could\",\"change\":\"...\",\"rationale\":\"...\"}}],\n  \"evidenceGaps\": [\"...\"],\n  \"followUpQuestions\": [\"...\"],\n  \"citations\": [{{\"title\":\"...\",\"url\":\"...\",\"quote\":\"...\"}}]\n}}\n\nORIGINAL REQUEST:\n{payload}\n\nPANEL OUTPUTS:\n{panel}"
     )
 }
+
+#[cfg(test)]
+mod pure_residual_tests {
+    use super::*;
+    use crate::types::{ConsultationRequest, ConsultationRequestBase, PrivacyClass, ReviewDecisionRequest};
+
+    fn sample() -> ConsultationRequest {
+        ConsultationRequest::ReviewDecision(ReviewDecisionRequest {
+            base: ConsultationRequestBase {
+                title: Some("t".into()),
+                context: "c".into(),
+                constraints: None,
+                privacy_class: PrivacyClass::Internal,
+                budget: None,
+                output_mode: "concise".into(),
+                current_evidence: None,
+            },
+            decision: "ship".into(),
+        })
+    }
+
+    #[test]
+    fn panel_and_judge_prompts_include_kind_and_json() {
+        let req = sample();
+        let panel = panel_prompt(&req);
+        assert!(panel.contains("review_decision"));
+        assert!(panel.contains("REQUEST JSON:"));
+        assert!(panel.contains("ship"));
+        let judge = judge_prompt(ConsultationKind::ReviewDecision, &req, &["panel-a".into(), "panel-b".into()]);
+        assert!(judge.contains("PANEL 1"));
+        assert!(judge.contains("PANEL 2"));
+        assert!(judge.contains("panel-a"));
+        assert!(judge.contains("Return JSON only"));
+        assert!(judge.contains("strong_accept"));
+    }
+}

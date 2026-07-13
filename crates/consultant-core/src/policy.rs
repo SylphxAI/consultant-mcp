@@ -341,4 +341,23 @@ mod tests {
         assert_eq!(a.len(), 24);
         assert!(a.chars().all(|c| c.is_ascii_hexdigit()));
     }
+
+
+    #[test]
+    fn allows_confidential_when_external_allowed() {
+        let request = sample_request(PrivacyClass::Confidential, "plain context", None, None);
+        let decision = apply_policy(&request, &sample_config(false, 10.0, true));
+        assert!(decision.allowed, "{:?}", decision.reason);
+        assert_eq!(decision.budget_status, "ok");
+    }
+
+    #[test]
+    fn uses_default_max_usd_when_budget_absent() {
+        // model_count=2 => estimate 0.50; default max 10 => ok
+        let request = sample_request(PrivacyClass::Internal, "plain", None, None);
+        let decision = apply_policy(&request, &sample_config(true, 10.0, false));
+        assert!(decision.allowed);
+        assert_eq!(decision.estimated_cost_usd, 0.5);
+        assert_eq!(decision.budget_status, "ok");
+    }
 }

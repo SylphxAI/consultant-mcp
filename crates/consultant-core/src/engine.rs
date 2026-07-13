@@ -403,3 +403,59 @@ pub async fn run_consultation(
         },
     }
 }
+
+#[cfg(test)]
+mod pure_residual_tests {
+    use super::*;
+
+    #[test]
+    fn extract_json_accepts_fenced_and_embedded() {
+        let raw = r#"{"verdict":"accept_with_changes","confidence":0.8,"executiveSummary":"ok"}"#;
+        let j = extract_json(raw).expect("raw");
+        assert_eq!(j.verdict, Some(Verdict::AcceptWithChanges));
+        assert_eq!(j.confidence, Some(0.8));
+
+        let fenced = "```json\n{\"verdict\":\"reject\",\"confidence\":0.9,\"executiveSummary\":\"no\"}\n```";
+        let j = extract_json(fenced).expect("fenced");
+        assert_eq!(j.verdict, Some(Verdict::Reject));
+
+        let embedded = "noise before {\"verdict\":\"needs_more_evidence\",\"confidence\":0.4,\"executiveSummary\":\"gap\"} trailing";
+        let j = extract_json(embedded).expect("embedded");
+        assert_eq!(j.verdict, Some(Verdict::NeedsMoreEvidence));
+
+        assert!(extract_json("not json at all").is_err());
+    }
+
+    #[test]
+    fn sanitize_judge_defaults_and_clamps_confidence() {
+        let json = JudgeJson {
+            verdict: None,
+            confidence: Some(1.5),
+            executive_summary: None,
+            consensus: None,
+            disagreements: None,
+            blind_spots: None,
+            recommended_changes: Some(vec![RecommendedChangeJson {
+                priority: None,
+                change: None,
+                rationale: None,
+            }]),
+            evidence_gaps: None,
+            follow_up_questions: None,
+            citations: Some(vec![CitationJson {
+                title: None,
+                url: Some("https://example.com".into()),
+                quote: None,
+            }]),
+        };
+        let judged = sanitize_judge(json);
+        assert_eq!(judged.verdict, Verdict::NeedsMoreEvidence);
+        assert_eq!(judged.confidence, 1.0);
+        assert!(judged.executive_summary.contains("no executive summary"));
+        assert_eq!(judged.recommended_changes.len(), 1);
+        assert_eq!(judged.recommended_changes[0].priority, "should");
+        assert_eq!(judged.recommended_changes[0].change, "Unspecified change");
+        assert_eq!(judged.citations[0].title, "Untitled source");
+        assert_eq!(judged.citations[0].url.as_deref(), Some("https://example.com"));
+    }
+}
