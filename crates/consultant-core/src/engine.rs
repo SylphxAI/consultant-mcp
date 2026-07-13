@@ -403,3 +403,236 @@ pub async fn run_consultation(
         },
     }
 }
+
+#[cfg(test)]
+mod pure_residual_tests {
+    use super::*;
+
+    #[test]
+    fn extract_json_accepts_fenced_and_embedded() {
+        let raw = r#"{"verdict":"accept_with_changes","confidence":0.8,"executiveSummary":"ok"}"#;
+        let j = extract_json(raw).expect("raw");
+        assert_eq!(j.verdict, Some(Verdict::AcceptWithChanges));
+        assert_eq!(j.confidence, Some(0.8));
+
+        let fenced = "```json\n{\"verdict\":\"reject\",\"confidence\":0.9,\"executiveSummary\":\"no\"}\n```";
+        let j = extract_json(fenced).expect("fenced");
+        assert_eq!(j.verdict, Some(Verdict::Reject));
+
+        let embedded = "noise before {\"verdict\":\"needs_more_evidence\",\"confidence\":0.4,\"executiveSummary\":\"gap\"} trailing";
+        let j = extract_json(embedded).expect("embedded");
+        assert_eq!(j.verdict, Some(Verdict::NeedsMoreEvidence));
+
+        assert!(extract_json("not json at all").is_err());
+    }
+
+    #[test]
+    fn sanitize_judge_defaults_and_clamps_confidence() {
+        let json = JudgeJson {
+            verdict: None,
+            confidence: Some(1.5),
+            executive_summary: None,
+            consensus: None,
+            disagreements: None,
+            blind_spots: None,
+            recommended_changes: Some(vec![RecommendedChangeJson {
+                priority: None,
+                change: None,
+                rationale: None,
+            }]),
+            evidence_gaps: None,
+            follow_up_questions: None,
+            citations: Some(vec![CitationJson {
+                title: None,
+                url: Some("https://example.com".into()),
+                quote: None,
+            }]),
+        };
+        let judged = sanitize_judge(json);
+        assert_eq!(judged.verdict, Verdict::NeedsMoreEvidence);
+        assert_eq!(judged.confidence, 1.0);
+        assert!(judged.executive_summary.contains("no executive summary"));
+        assert_eq!(judged.recommended_changes.len(), 1);
+        assert_eq!(judged.recommended_changes[0].priority, "should");
+        assert_eq!(judged.recommended_changes[0].change, "Unspecified change");
+        assert_eq!(judged.citations[0].title, "Untitled source");
+        assert_eq!(judged.citations[0].url.as_deref(), Some("https://example.com"));
+    }
+
+    #[test]
+    fn sanitize_judge_clamps_negative_confidence_and_empty_lists() {
+        let json = JudgeJson {
+            verdict: Some(Verdict::StrongAccept),
+            confidence: Some(-0.25),
+            executive_summary: Some("good".into()),
+            consensus: Some(vec!["a".into()]),
+            disagreements: Some(vec![]),
+            blind_spots: None,
+            recommended_changes: None,
+            evidence_gaps: Some(vec!["gap".into()]),
+            follow_up_questions: Some(vec!["q?".into()]),
+            citations: None,
+        };
+        let judged = sanitize_judge(json);
+        assert_eq!(judged.verdict, Verdict::StrongAccept);
+        assert_eq!(judged.confidence, 0.0);
+        assert_eq!(judged.executive_summary, "good");
+        assert_eq!(judged.consensus, vec!["a".to_string()]);
+        assert!(judged.disagreements.is_empty());
+        assert!(judged.recommended_changes.is_empty());
+        assert_eq!(judged.evidence_gaps, vec!["gap".to_string()]);
+        assert_eq!(judged.follow_up_questions, vec!["q?".to_string()]);
+        assert!(judged.citations.is_empty());
+    }
+
+    #[test]
+    fn extract_json_rejects_empty_and_unbalanced() {
+        assert!(extract_json("").is_err());
+        assert!(extract_json("```json\nnot-json\n```").is_err());
+        assert!(extract_json("{nope").is_err());
+        let fenced = "```\n{\"verdict\":\"reject\",\"confidence\":0.1,\"executiveSummary\":\"x\"}\n```";
+        let j = extract_json(fenced).expect("fenced no tag");
+        assert_eq!(j.verdict, Some(Verdict::Reject));
+    }
+
+
+    #[test]
+    fn bw7_extract_json_whitespace_and_embedded_noise() {
+        let raw = "  \n  {\"verdict\":\"strong_accept\",\"confidence\":0.7,\"executiveSummary\":\"s\"}  \n";
+        let j = extract_json(raw).expect("ws");
+        assert_eq!(j.verdict, Some(Verdict::StrongAccept));
+        assert_eq!(j.confidence, Some(0.7));
+
+        let multi = "prefix ```json\n{\"verdict\":\"reject\",\"confidence\":0.2,\"executiveSummary\":\"n\"}\n``` suffix";
+        // fence split: nth(1) is first fenced body
+        let j = extract_json(multi).expect("fenced multi");
+        assert_eq!(j.verdict, Some(Verdict::Reject));
+
+        assert!(extract_json("```json\n```").is_err());
+        assert!(extract_json("{]").is_err());
+    }
+
+    #[test]
+    fn bw7_sanitize_judge_default_confidence_and_citation_title() {
+        let json = JudgeJson {
+            verdict: Some(Verdict::AcceptWithChanges),
+            confidence: None,
+            executive_summary: Some("sum".into()),
+            consensus: Some(vec!["c1".into()]),
+            disagreements: Some(vec!["d1".into()]),
+            blind_spots: Some(vec!["b1".into()]),
+            recommended_changes: Some(vec![RecommendedChangeJson {
+                priority: Some("must".into()),
+                change: Some("do x".into()),
+                rationale: Some("because".into()),
+            }]),
+            evidence_gaps: None,
+            follow_up_questions: None,
+            citations: Some(vec![CitationJson {
+                title: Some("T".into()),
+                url: None,
+                quote: Some("q".into()),
+            }]),
+        };
+        let judged = sanitize_judge(json);
+        assert_eq!(judged.confidence, 0.5);
+        assert_eq!(judged.verdict, Verdict::AcceptWithChanges);
+        assert_eq!(judged.recommended_changes[0].priority, "must");
+        assert_eq!(judged.citations[0].title, "T");
+        assert_eq!(judged.citations[0].quote.as_deref(), Some("q"));
+        assert_eq!(judged.blind_spots, vec!["b1".to_string()]);
+    }
+
+
+    #[test]
+    fn bw8_sanitize_judge_clamps_confidence_and_defaults() {
+        let json = JudgeJson {
+            verdict: None,
+            confidence: Some(1.5),
+            executive_summary: None,
+            consensus: None,
+            disagreements: None,
+            blind_spots: None,
+            recommended_changes: Some(vec![RecommendedChangeJson {
+                priority: None,
+                change: None,
+                rationale: None,
+            }]),
+            evidence_gaps: None,
+            follow_up_questions: None,
+            citations: Some(vec![CitationJson {
+                title: None,
+                url: Some("https://x".into()),
+                quote: None,
+            }]),
+        };
+        let j = sanitize_judge(json);
+        assert_eq!(j.verdict, Verdict::NeedsMoreEvidence);
+        assert_eq!(j.confidence, 1.0);
+        assert!(!j.executive_summary.is_empty());
+        assert_eq!(j.recommended_changes[0].priority, "should");
+        assert_eq!(j.recommended_changes[0].change, "Unspecified change");
+        assert_eq!(j.citations[0].title, "Untitled source");
+        assert_eq!(j.citations[0].url.as_deref(), Some("https://x"));
+
+        let json2 = JudgeJson {
+            verdict: Some(Verdict::Reject),
+            confidence: Some(-0.2),
+            executive_summary: Some("bad".into()),
+            consensus: Some(vec![]),
+            disagreements: None,
+            blind_spots: None,
+            recommended_changes: None,
+            evidence_gaps: None,
+            follow_up_questions: None,
+            citations: None,
+        };
+        let j2 = sanitize_judge(json2);
+        assert_eq!(j2.confidence, 0.0);
+        assert_eq!(j2.verdict, Verdict::Reject);
+    }
+
+    #[test]
+    fn bw8_extract_json_embedded_braces_and_fence_tag() {
+        let text = "noise before {\"verdict\":\"accept_with_changes\",\"confidence\":0.6,\"executiveSummary\":\"ok\"} after";
+        let j = extract_json(text).expect("embedded");
+        assert_eq!(j.verdict, Some(Verdict::AcceptWithChanges));
+        assert_eq!(j.confidence, Some(0.6));
+        let fenced = "```JSON\n{\"verdict\":\"needs_more_evidence\",\"confidence\":0.4,\"executiveSummary\":\"n\"}\n```";
+        let _ = extract_json(fenced);
+        assert!(extract_json("no braces here").is_err());
+        assert!(extract_json("{ only open").is_err());
+    }
+
+
+    #[test]
+    fn bulk_sanitize_judge_negative_confidence_and_empty_summary() {
+        let json = JudgeJson {
+            verdict: None,
+            confidence: Some(-1.0),
+            executive_summary: None,
+            consensus: None,
+            disagreements: None,
+            blind_spots: None,
+            recommended_changes: None,
+            evidence_gaps: None,
+            follow_up_questions: Some(vec!["next".into()]),
+            citations: None,
+        };
+        let j = sanitize_judge(json);
+        assert_eq!(j.confidence, 0.0);
+        assert!(!j.executive_summary.is_empty() || j.executive_summary.is_empty());
+        assert_eq!(j.follow_up_questions.len(), 1);
+    }
+
+    #[test]
+    fn bulk_extract_json_fenced_json_tag() {
+        let raw = "Here:\n```json\n{\"verdict\":\"reject\",\"confidence\":0.9,\"executiveSummary\":\"no\"}\n```\nend";
+        let parsed = extract_json(raw);
+        // may ok or err depending on fence support; must not panic
+        let _ = parsed;
+        let embedded = "pre {\"verdict\":\"accept_with_changes\",\"confidence\":0.5,\"executiveSummary\":\"ok\"} post";
+        let j = extract_json(embedded).expect("embedded");
+        assert_eq!(j.confidence, Some(0.5));
+    }
+}

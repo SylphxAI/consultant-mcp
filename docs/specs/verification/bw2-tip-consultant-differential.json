@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 2,
+  "slice": "consultant-mcp.tools|transport.stdio|transport.http",
+  "status": "differential_green",
+  "verifiedAt": "2026-07-13T00:20:14+00:00",
+  "lastComparedMainSha": "4f26d5c7ec991887ca3e4a70e8b8007cd040136a",
+  "mergeGroupSha": "4f26d5c7ec991887ca3e4a70e8b8007cd040136a",
+  "baselineTsSha": "47b246ba7239c85053e2f0a79f888fbaf814c9e0",
+  "rustCandidateSha": "4f26d5c7ec991887ca3e4a70e8b8007cd040136a",
+  "behaviorSpecHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+  "fixtureCorpusHash": "4a91802467de509c254abd6b88672387c5447b9dda55246ceb054d7d8c5536da",
+  "caseCount": 23,
+  "httpProbeCaseCount": 4,
+  "harness": "scripts/run-consultant-mcp-differential.sh",
+  "differentialTest": "crates/consultant-core/tests/consultant_mcp_differential.rs#consultant_mcp_differential_matches_ts_oracle",
+  "oracle": "scripts/differential/consultant-mcp-oracle.ts",
+  "promotionHold": true,
+  "promotionHoldRef": "rej-010",
+  "authorityRustPromotions": 0,
+  "tsDeletedPromotions": 0
+}
