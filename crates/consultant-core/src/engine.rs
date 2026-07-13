@@ -458,4 +458,41 @@ mod pure_residual_tests {
         assert_eq!(judged.citations[0].title, "Untitled source");
         assert_eq!(judged.citations[0].url.as_deref(), Some("https://example.com"));
     }
+
+    #[test]
+    fn sanitize_judge_clamps_negative_confidence_and_empty_lists() {
+        let json = JudgeJson {
+            verdict: Some(Verdict::StrongAccept),
+            confidence: Some(-0.25),
+            executive_summary: Some("good".into()),
+            consensus: Some(vec!["a".into()]),
+            disagreements: Some(vec![]),
+            blind_spots: None,
+            recommended_changes: None,
+            evidence_gaps: Some(vec!["gap".into()]),
+            follow_up_questions: Some(vec!["q?".into()]),
+            citations: None,
+        };
+        let judged = sanitize_judge(json);
+        assert_eq!(judged.verdict, Verdict::StrongAccept);
+        assert_eq!(judged.confidence, 0.0);
+        assert_eq!(judged.executive_summary, "good");
+        assert_eq!(judged.consensus, vec!["a".to_string()]);
+        assert!(judged.disagreements.is_empty());
+        assert!(judged.recommended_changes.is_empty());
+        assert_eq!(judged.evidence_gaps, vec!["gap".to_string()]);
+        assert_eq!(judged.follow_up_questions, vec!["q?".to_string()]);
+        assert!(judged.citations.is_empty());
+    }
+
+    #[test]
+    fn extract_json_rejects_empty_and_unbalanced() {
+        assert!(extract_json("").is_err());
+        assert!(extract_json("```json\nnot-json\n```").is_err());
+        assert!(extract_json("{nope").is_err());
+        let fenced = "```\n{\"verdict\":\"reject\",\"confidence\":0.1,\"executiveSummary\":\"x\"}\n```";
+        let j = extract_json(fenced).expect("fenced no tag");
+        assert_eq!(j.verdict, Some(Verdict::Reject));
+    }
+
 }

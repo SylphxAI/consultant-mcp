@@ -80,4 +80,51 @@ mod pure_residual_tests {
         assert!(judge.contains("Return JSON only"));
         assert!(judge.contains("strong_accept"));
     }
+
+    #[test]
+    fn panel_prompt_labels_research_challenge_compare() {
+        use crate::types::{
+            ChallengeAnswerRequest, CompareOption, CompareOptionsRequest, ResearchRequest,
+        };
+        let base = ConsultationRequestBase {
+            title: None,
+            context: "c".into(),
+            constraints: None,
+            privacy_class: PrivacyClass::Internal,
+            budget: None,
+            output_mode: "concise".into(),
+            current_evidence: None,
+        };
+        let research = ConsultationRequest::Research(ResearchRequest {
+            base: base.clone(),
+            question: "why?".into(),
+            scope: Some("api".into()),
+        });
+        let p = panel_prompt(&research);
+        assert!(p.contains("research"));
+        assert!(p.contains("why?"));
+        let judge = judge_prompt(ConsultationKind::Research, &research, &["x".into()]);
+        assert!(judge.contains("research"));
+        assert!(judge.contains("PANEL 1"));
+
+        let challenge = ConsultationRequest::ChallengeAnswer(ChallengeAnswerRequest {
+            base: base.clone(),
+            task: "task".into(),
+            proposed_answer: "ans".into(),
+        });
+        assert!(panel_prompt(&challenge).contains("challenge_answer"));
+        assert!(panel_prompt(&challenge).contains("ans"));
+
+        let compare = ConsultationRequest::CompareOptions(CompareOptionsRequest {
+            base,
+            problem: "p".into(),
+            options: vec![CompareOption {
+                name: "A".into(),
+                description: "da".into(),
+            }],
+        });
+        assert!(panel_prompt(&compare).contains("compare_options"));
+        assert!(panel_prompt(&compare).contains("\"A\"") || panel_prompt(&compare).contains("A"));
+    }
+
 }

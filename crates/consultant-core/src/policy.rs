@@ -360,4 +360,38 @@ mod tests {
         assert_eq!(decision.estimated_cost_usd, 0.5);
         assert_eq!(decision.budget_status, "ok");
     }
+
+    #[test]
+    fn hash_request_is_stable_and_order_insensitive() {
+        let a = sample_request(PrivacyClass::Internal, "hello", None, None);
+        let b = sample_request(PrivacyClass::Internal, "hello", None, None);
+        assert_eq!(hash_request(&a), hash_request(&b));
+        assert_eq!(hash_request(&a).len(), 24);
+        let c = sample_request(PrivacyClass::Internal, "hello!", None, None);
+        assert_ne!(hash_request(&a), hash_request(&c));
+    }
+
+    #[test]
+    fn redacts_openai_github_aws_and_private_key_patterns() {
+        let ctx = "key sk-abcdefghijklmnopqrstuv token ghp_abcdefghijklmnopqrst secret AKIAIOSFODNN7EXAMPLE pem -----BEGIN RSA PRIVATE KEY-----\nABC\n-----END RSA PRIVATE KEY-----";
+        let request = sample_request(PrivacyClass::Internal, ctx, None, None);
+        let config = sample_config(true, 10.0, false);
+        let decision = apply_policy(&request, &config);
+        assert!(decision.redaction_applied);
+        let redacted = serde_json::to_string(&decision.redacted_request).unwrap();
+        assert!(redacted.contains("REDACTED_OPENAI_STYLE_KEY") || redacted.contains("REDACTED"));
+        assert!(!redacted.contains("sk-abcdefghijklmnopqrstuv"));
+        assert!(!redacted.contains("ghp_abcdefghijklmnopqrst"));
+        assert!(!redacted.contains("AKIAIOSFODNN7EXAMPLE"));
+    }
+
+    #[test]
+    fn stable_json_sorts_object_keys() {
+        use serde_json::json;
+        let a = json!({"b": 1, "a": 2});
+        let b = json!({"a": 2, "b": 1});
+        assert_eq!(stable_json(&a), stable_json(&b));
+        assert_eq!(stable_json(&a), r#"{"a":2,"b":1}"#);
+    }
+
 }
