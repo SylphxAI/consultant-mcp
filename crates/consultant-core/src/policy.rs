@@ -228,4 +228,117 @@ mod tests {
         let decision = apply_policy(&request, &config);
         assert!(decision.redaction_applied);
     }
+
+    fn sample_config(mock: bool, max_usd: f64, allow_confidential: bool) -> ConsultantConfig {
+        ConsultantConfig {
+            provider_name: "mock".to_string(),
+            panel_models: vec!["mock-a".to_string()],
+            judge_model: "mock-judge".to_string(),
+            timeout_ms: 1_000,
+            max_output_tokens: 1_000,
+            default_max_usd: max_usd,
+            allow_confidential_external: allow_confidential,
+            mock,
+        }
+    }
+
+    fn sample_request(
+        privacy: PrivacyClass,
+        context: &str,
+        max_usd: Option<f64>,
+        require_approval_over_usd: Option<f64>,
+    ) -> ConsultationRequest {
+        ConsultationRequest::ReviewDecision(ReviewDecisionRequest {
+            base: ConsultationRequestBase {
+                title: None,
+                context: context.to_string(),
+                constraints: None,
+                privacy_class: privacy,
+                budget: if max_usd.is_some() || require_approval_over_usd.is_some() {
+                    Some(crate::types::BudgetPolicy {
+                        max_usd,
+                        max_latency_ms: None,
+                        require_approval_over_usd,
+                    })
+                } else {
+                    None
+                },
+                output_mode: "concise".to_string(),
+                current_evidence: None,
+            },
+            decision: "ship it".to_string(),
+        })
+    }
+
+    #[test]
+    fn blocks_confidential_without_allow_flag() {
+        let request = sample_request(PrivacyClass::Confidential, "plain context", None, None);
+        let decision = apply_policy(&request, &sample_config(false, 10.0, false));
+        assert!(!decision.allowed);
+        assert_eq!(
+            decision.reason.as_deref(),
+            Some("confidential_external_provider_blocked")
+        );
+        assert_eq!(decision.budget_status, "blocked");
+    }
+
+    #[test]
+    fn allows_confidential_in_mock_mode() {
+        let request = sample_request(PrivacyClass::Confidential, "plain context", None, None);
+        let decision = apply_policy(&request, &sample_config(true, 10.0, false));
+        assert!(decision.allowed);
+        assert_eq!(decision.budget_status, "ok");
+    }
+
+    #[test]
+    fn blocks_when_estimated_cost_exceeds_max_usd() {
+        // panel_models=1 + judge => model_count=2 => 0.50 USD estimate
+        let request = sample_request(PrivacyClass::Internal, "plain", Some(0.25), None);
+        let decision = apply_policy(&request, &sample_config(true, 10.0, false));
+        assert!(!decision.allowed);
+        assert_eq!(
+            decision.reason.as_deref(),
+            Some("estimated_cost_exceeds_max_usd")
+        );
+        assert_eq!(decision.budget_status, "blocked");
+        assert_eq!(decision.estimated_cost_usd, 0.5);
+    }
+
+    #[test]
+    fn requires_approval_over_threshold() {
+        let request = sample_request(PrivacyClass::Internal, "plain", None, Some(0.25));
+        let decision = apply_policy(&request, &sample_config(true, 10.0, false));
+        assert!(!decision.allowed);
+        assert_eq!(
+            decision.reason.as_deref(),
+            Some("estimated_cost_requires_approval")
+        );
+        assert_eq!(decision.budget_status, "requires_approval");
+    }
+
+    #[test]
+    fn redacts_openai_and_aws_style_secrets() {
+        let request = sample_request(
+            PrivacyClass::Internal,
+            "key sk-abcdefghijklmnopqrstuvwxyz token AKIAIOSFODNN7EXAMPLE",
+            None,
+            None,
+        );
+        let decision = apply_policy(&request, &sample_config(true, 10.0, false));
+        assert!(decision.redaction_applied);
+        let ctx = decision.redacted_request.base().context.clone();
+        assert!(ctx.contains("[REDACTED_OPENAI_STYLE_KEY]"), "{ctx}");
+        assert!(ctx.contains("[REDACTED_AWS_ACCESS_KEY]"), "{ctx}");
+        assert!(!ctx.contains("sk-abcdefghijklmnopqrstuvwxyz"));
+    }
+
+    #[test]
+    fn request_hash_is_stable_24_hex() {
+        let request = sample_request(PrivacyClass::Internal, "stable", None, None);
+        let a = hash_request(&request);
+        let b = hash_request(&request);
+        assert_eq!(a, b);
+        assert_eq!(a.len(), 24);
+        assert!(a.chars().all(|c| c.is_ascii_hexdigit()));
+    }
 }
