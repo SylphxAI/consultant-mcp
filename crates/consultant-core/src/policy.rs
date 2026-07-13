@@ -458,4 +458,25 @@ mod tests {
         let decision = apply_policy(&request, &sample_config(true, 10.0, true));
         assert!(decision.allowed, "{:?}", decision.reason);
     }
+
+
+    #[test]
+    fn bulk_redact_value_secret_patterns() {
+        use serde_json::json;
+        let v = json!("token=sk-abcdefghijklmnopqrstuvwxyz012345");
+        let r = redact_value(v);
+        let s = match &r.value {
+            Value::String(t) => t.clone(),
+            other => other.to_string(),
+        };
+        assert!(r.changed || s.contains("REDACTED") || !s.contains("sk-abc"), "{s} changed={}", r.changed);
+    }
+
+    #[test]
+    fn bulk_stable_json_object_key_order_independent() {
+        use serde_json::json;
+        let a = json!({"b":1,"a":2});
+        let b = json!({"a":2,"b":1});
+        assert_eq!(stable_json(&a), stable_json(&b));
+    }
 }

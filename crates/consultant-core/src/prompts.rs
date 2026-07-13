@@ -197,4 +197,30 @@ mod pure_residual_tests {
         assert!(p.contains("which"));
         assert!(p.contains("A") && p.contains("B"));
     }
+
+
+
+
+    #[test]
+    fn bulk_panel_prompt_includes_context() {
+        use crate::types::{
+            ConsultationRequest, ConsultationRequestBase, PrivacyClass, ReviewDecisionRequest,
+        };
+        let base = ConsultationRequestBase {
+            title: Some("t".into()),
+            context: "legacy ts migration".into(),
+            constraints: None,
+            privacy_class: PrivacyClass::Internal,
+            budget: None,
+            output_mode: "detailed".into(),
+            current_evidence: None,
+        };
+        let req = ConsultationRequest::ReviewDecision(ReviewDecisionRequest {
+            base,
+            decision: "ship it".into(),
+        });
+        let prompt = panel_prompt(&req);
+        assert!(prompt.contains("legacy ts migration"), "{prompt}");
+        assert!(prompt.contains("ship it") || prompt.to_lowercase().contains("review"), "{prompt}");
+    }
 }

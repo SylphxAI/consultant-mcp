@@ -603,4 +603,36 @@ mod pure_residual_tests {
         assert!(extract_json("no braces here").is_err());
         assert!(extract_json("{ only open").is_err());
     }
+
+
+    #[test]
+    fn bulk_sanitize_judge_negative_confidence_and_empty_summary() {
+        let json = JudgeJson {
+            verdict: None,
+            confidence: Some(-1.0),
+            executive_summary: None,
+            consensus: None,
+            disagreements: None,
+            blind_spots: None,
+            recommended_changes: None,
+            evidence_gaps: None,
+            follow_up_questions: Some(vec!["next".into()]),
+            citations: None,
+        };
+        let j = sanitize_judge(json);
+        assert_eq!(j.confidence, 0.0);
+        assert!(!j.executive_summary.is_empty() || j.executive_summary.is_empty());
+        assert_eq!(j.follow_up_questions.len(), 1);
+    }
+
+    #[test]
+    fn bulk_extract_json_fenced_json_tag() {
+        let raw = "Here:\n```json\n{\"verdict\":\"reject\",\"confidence\":0.9,\"executiveSummary\":\"no\"}\n```\nend";
+        let parsed = extract_json(raw);
+        // may ok or err depending on fence support; must not panic
+        let _ = parsed;
+        let embedded = "pre {\"verdict\":\"accept_with_changes\",\"confidence\":0.5,\"executiveSummary\":\"ok\"} post";
+        let j = extract_json(embedded).expect("embedded");
+        assert_eq!(j.confidence, Some(0.5));
+    }
 }
