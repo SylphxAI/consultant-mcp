@@ -428,4 +428,34 @@ mod tests {
         assert_eq!(decision.budget_status, "ok");
     }
 
+
+    #[test]
+    fn bw8_budget_exceeded_when_estimate_over_max() {
+        let request = sample_request(PrivacyClass::Internal, "plain", Some(0.1), None);
+        let decision = apply_policy(&request, &sample_config(true, 10.0, false));
+        assert!(!decision.allowed, "{:?}", decision.reason);
+        // Honest residual: over-max budget uses budget_status "blocked" + reason estimated_cost_exceeds_max_usd
+        assert_eq!(decision.budget_status, "blocked");
+        assert_eq!(decision.reason.as_deref(), Some("estimated_cost_exceeds_max_usd"));
+    }
+
+    #[test]
+    fn bw8_stable_json_arrays_preserve_order_and_hash_len() {
+        use serde_json::json;
+        assert_ne!(
+            stable_json(&json!([1, 2])),
+            stable_json(&json!([2, 1]))
+        );
+        assert_eq!(stable_json(&json!(null)), "null");
+        assert_eq!(stable_json(&json!("x")), "\"x\"");
+        let r = sample_request(PrivacyClass::Internal, "ctx", None, None);
+        assert_eq!(hash_request(&r).len(), 24);
+    }
+
+    #[test]
+    fn bw8_confidential_allowed_when_flag_true() {
+        let request = sample_request(PrivacyClass::Confidential, "plain", None, None);
+        let decision = apply_policy(&request, &sample_config(true, 10.0, true));
+        assert!(decision.allowed, "{:?}", decision.reason);
+    }
 }

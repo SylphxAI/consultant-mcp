@@ -150,4 +150,51 @@ mod pure_residual_tests {
         assert!(panel.contains("\"decision\"") || panel.contains("ship"));
     }
 
+
+    #[test]
+    fn bw8_judge_prompt_includes_verdict_enum_tokens() {
+        let req = sample();
+        let judge = judge_prompt(ConsultationKind::ReviewDecision, &req, &["p1".into()]);
+        for token in ["strong_accept", "accept_with_changes", "reject", "needs_more_evidence"] {
+            assert!(judge.contains(token), "missing {token} in {judge}");
+        }
+        assert!(judge.contains("PANEL 1"));
+        assert!(judge.contains("p1"));
+    }
+
+    #[test]
+    fn bw8_panel_prompt_research_scope_and_compare_option_json() {
+        use crate::types::{
+            CompareOption, CompareOptionsRequest, ResearchRequest,
+        };
+        let base = ConsultationRequestBase {
+            title: Some("t".into()),
+            context: "c".into(),
+            constraints: Some(vec!["no net".into()]),
+            privacy_class: PrivacyClass::Internal,
+            budget: None,
+            output_mode: "detailed".into(),
+            current_evidence: None,
+        };
+        let research = ConsultationRequest::Research(ResearchRequest {
+            base: base.clone(),
+            question: "q?".into(),
+            scope: Some("billing".into()),
+        });
+        let p = panel_prompt(&research);
+        assert!(p.contains("billing"));
+        assert!(p.contains("q?"));
+        let compare = ConsultationRequest::CompareOptions(CompareOptionsRequest {
+            base,
+            problem: "which".into(),
+            options: vec![
+                CompareOption { name: "A".into(), description: "da".into() },
+                CompareOption { name: "B".into(), description: "db".into() },
+            ],
+        });
+        let p = panel_prompt(&compare);
+        assert!(p.contains("compare_options"));
+        assert!(p.contains("which"));
+        assert!(p.contains("A") && p.contains("B"));
+    }
 }
