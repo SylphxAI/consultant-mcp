@@ -495,4 +495,52 @@ mod pure_residual_tests {
         assert_eq!(j.verdict, Some(Verdict::Reject));
     }
 
+
+    #[test]
+    fn bw7_extract_json_whitespace_and_embedded_noise() {
+        let raw = "  \n  {\"verdict\":\"strong_accept\",\"confidence\":0.7,\"executiveSummary\":\"s\"}  \n";
+        let j = extract_json(raw).expect("ws");
+        assert_eq!(j.verdict, Some(Verdict::StrongAccept));
+        assert_eq!(j.confidence, Some(0.7));
+
+        let multi = "prefix ```json\n{\"verdict\":\"reject\",\"confidence\":0.2,\"executiveSummary\":\"n\"}\n``` suffix";
+        // fence split: nth(1) is first fenced body
+        let j = extract_json(multi).expect("fenced multi");
+        assert_eq!(j.verdict, Some(Verdict::Reject));
+
+        assert!(extract_json("```json\n```").is_err());
+        assert!(extract_json("{]").is_err());
+    }
+
+    #[test]
+    fn bw7_sanitize_judge_default_confidence_and_citation_title() {
+        let json = JudgeJson {
+            verdict: Some(Verdict::AcceptWithChanges),
+            confidence: None,
+            executive_summary: Some("sum".into()),
+            consensus: Some(vec!["c1".into()]),
+            disagreements: Some(vec!["d1".into()]),
+            blind_spots: Some(vec!["b1".into()]),
+            recommended_changes: Some(vec![RecommendedChangeJson {
+                priority: Some("must".into()),
+                change: Some("do x".into()),
+                rationale: Some("because".into()),
+            }]),
+            evidence_gaps: None,
+            follow_up_questions: None,
+            citations: Some(vec![CitationJson {
+                title: Some("T".into()),
+                url: None,
+                quote: Some("q".into()),
+            }]),
+        };
+        let judged = sanitize_judge(json);
+        assert_eq!(judged.confidence, 0.5);
+        assert_eq!(judged.verdict, Verdict::AcceptWithChanges);
+        assert_eq!(judged.recommended_changes[0].priority, "must");
+        assert_eq!(judged.citations[0].title, "T");
+        assert_eq!(judged.citations[0].quote.as_deref(), Some("q"));
+        assert_eq!(judged.blind_spots, vec!["b1".to_string()]);
+    }
+
 }

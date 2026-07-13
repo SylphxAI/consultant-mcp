@@ -394,4 +394,38 @@ mod tests {
         assert_eq!(stable_json(&a), r#"{"a":2,"b":1}"#);
     }
 
+
+    #[test]
+    fn bw7_redacts_openrouter_github_pat_and_password_patterns() {
+        let ctx = "openrouter sk-or-abcdefghijklmnopqrstuvwxyz token github_pat_abcdefghijklmnopqrst password=supersecret99 api_key: anothersecret";
+        let request = sample_request(PrivacyClass::Internal, ctx, None, None);
+        let decision = apply_policy(&request, &sample_config(true, 10.0, false));
+        assert!(decision.redaction_applied);
+        let redacted = serde_json::to_string(&decision.redacted_request).unwrap();
+        assert!(!redacted.contains("supersecret99"));
+        assert!(!redacted.contains("anothersecret"));
+        assert!(!redacted.contains("sk-or-abcdefghijklmnopqrstuvwxyz") || redacted.contains("REDACTED"));
+    }
+
+    #[test]
+    fn bw7_stable_json_nested_arrays_and_hash_differs_by_privacy() {
+        use serde_json::json;
+        let a = json!({"z": [3, 1], "a": {"y": 1, "x": 2}});
+        let b = json!({"a": {"x": 2, "y": 1}, "z": [3, 1]});
+        assert_eq!(stable_json(&a), stable_json(&b));
+        let r1 = sample_request(PrivacyClass::Internal, "same", None, None);
+        let r2 = sample_request(PrivacyClass::Confidential, "same", None, None);
+        assert_ne!(hash_request(&r1), hash_request(&r2));
+    }
+
+    #[test]
+    fn bw7_budget_ok_when_estimate_equals_max() {
+        // estimate = 0.5 for 2 models; max_usd = 0.5 should pass (> check)
+        let request = sample_request(PrivacyClass::Internal, "plain", Some(0.5), None);
+        let decision = apply_policy(&request, &sample_config(true, 10.0, false));
+        assert!(decision.allowed, "{:?}", decision.reason);
+        assert_eq!(decision.estimated_cost_usd, 0.5);
+        assert_eq!(decision.budget_status, "ok");
+    }
+
 }

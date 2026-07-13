@@ -127,4 +127,27 @@ mod pure_residual_tests {
         assert!(panel_prompt(&compare).contains("\"A\"") || panel_prompt(&compare).contains("A"));
     }
 
+
+    #[test]
+    fn bw7_judge_prompt_empty_panel_and_rubric() {
+        let req = sample();
+        let judge = judge_prompt(ConsultationKind::ReviewDecision, &req, &[]);
+        assert!(judge.contains("ORIGINAL REQUEST:"));
+        assert!(judge.contains("PANEL OUTPUTS:"));
+        assert!(judge.contains("senior production architect") || judge.contains("Evaluate like"));
+        assert!(judge.contains("review_decision"));
+        // empty panel still has section header but no PANEL N
+        assert!(!judge.contains("PANEL 1"));
+    }
+
+    #[test]
+    fn bw7_panel_prompt_contains_rubric_and_request_json() {
+        let req = sample();
+        let panel = panel_prompt(&req);
+        assert!(panel.contains("REQUEST JSON:"));
+        assert!(panel.contains("independent panel reviewer"));
+        assert!(panel.contains("review_decision"));
+        assert!(panel.contains("\"decision\"") || panel.contains("ship"));
+    }
+
 }
