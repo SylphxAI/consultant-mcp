@@ -53,6 +53,9 @@ jobs:
       - name: Verify package
         run: npm run verify
 
+      - name: TS stdio adapter deletion gate (transport/stdio-ts-adapter ts_deleted)
+        run: npm run check:ts-adapter-deleted
+
       - name: Rust clippy (no warnings)
         run: cargo clippy --all-targets -- -D warnings
 

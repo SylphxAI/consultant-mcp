@@ -1,17 +1,17 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const repoRoot = path.resolve(import.meta.dirname, "..");
 
-describe("MCP stdio transport routing", () => {
-  it("bin wrapper defaults to Rust rmcp stdio server with dual-path residual TS", () => {
+describe("MCP stdio transport routing (ts_deleted)", () => {
+  it("bin wrapper routes exclusively to Rust rmcp stdio server", () => {
     const bin = readFileSync(path.join(repoRoot, "bin/sylphx-consultant-mcp"), "utf8");
     expect(bin).toContain("resolve_rust_bin");
     expect(bin).toContain("resolve_transport");
     expect(bin).toContain('printf \'%s\\n\' "stdio"');
-    expect(bin).toContain("use_ts_transport");
-    expect(bin).toContain("dist/server.js");
+    expect(bin).not.toContain("use_ts_transport");
+    expect(bin).not.toContain("dist/server.js");
   });
 
   it("Rust MCP server exposes rmcp stdio transport module", () => {
@@ -28,23 +28,24 @@ describe("MCP stdio transport routing", () => {
     expect(stdioRs).toContain("transport::stdio");
   });
 
-  it("migration ledger marks transport/stdio-rust-rmcp as rust_impl (rej-010)", () => {
+  it("migration ledger marks transport/stdio-rust-rmcp as ts_deleted", () => {
     const ledger = JSON.parse(
       readFileSync(path.join(repoRoot, "docs/specs/consultant-mcp-migration-ledger.json"), "utf8")
     ) as {
       capabilities: Array<{ id: string; state: string }>;
     };
     const stdioRust = ledger.capabilities.find((cap) => cap.id === "transport/stdio-rust-rmcp");
-    expect(stdioRust?.state).toBe("rust_impl");
+    expect(stdioRust?.state).toBe("ts_deleted");
   });
 
-  it("stdio rust_impl gate script exists", () => {
+  it("stdio ts_deleted gate script exists", () => {
     const script = readFileSync(
       path.join(repoRoot, "scripts/check-no-ts-stdio-backend.sh"),
       "utf8"
     );
-    expect(script).toContain("rust_impl");
+    expect(script).toContain("ts_deleted");
     expect(script).toContain("stdio_transport.rs");
     expect(script).toContain("stdio_transport::serve_stdio");
+    expect(existsSync(path.join(repoRoot, "src/server.ts"))).toBe(false);
   });
 });

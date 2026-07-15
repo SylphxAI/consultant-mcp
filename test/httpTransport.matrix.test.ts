@@ -26,19 +26,19 @@ describe("web MCP HTTP transport routing", () => {
     expect(mainRs).toContain("http_transport::serve_http");
   });
 
-  it("migration ledger marks transport/web-mcp-http as rust_impl", () => {
+  it("migration ledger marks transport/web-mcp-http as ts_deleted", () => {
     const ledger = JSON.parse(
       readFileSync(path.join(repoRoot, "docs/specs/consultant-mcp-migration-ledger.json"), "utf8")
     ) as {
       capabilities: Array<{ id: string; state: string }>;
     };
     const http = ledger.capabilities.find((cap) => cap.id === "transport/web-mcp-http");
-    expect(http?.state).toBe("rust_impl");
+    expect(http?.state).toBe("ts_deleted");
   });
 
   it("HTTP authority gate script exists", () => {
     const script = readFileSync(path.join(repoRoot, "scripts/check-no-ts-http-backend.sh"), "utf8");
-    expect(script).toContain("rust_impl");
+    expect(script).toContain("ts_deleted");
     expect(script).toContain("StreamableHttpService");
   });
 });
