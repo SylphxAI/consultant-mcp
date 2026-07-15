@@ -1,14 +1,16 @@
-# Repository Agent Instructions
+# consultant-mcp — local agent notes only
 
-This repository follows the central doctrine in
-[SylphxAI/doctrine](https://github.com/SylphxAI/doctrine).
+Doctrine and fleet delivery law live in the **host always-on constitution**
+(`~/.grok/AGENTS.md` / Doctrine template). This file must **not** restate,
+weaken, or fork that law (including PR-vs-direct-trunk delivery).
 
-Before changing behavior, read [PROJECT.md](./PROJECT.md),
-[project.manifest.json](./project.manifest.json), and
-[.doctrine/project.json](./.doctrine/project.json). Keep enterprise policy in
-doctrine; keep only repo-local package facts here.
+Local truth: `PROJECT.md`, `.doctrine/project.json` when present.
 
-Useful validation for this package:
+## Boundary hazards
+
+- Never commit secrets, tokens, `.env` files, or credentials.
+
+## Local commands
 
 - `npm run typecheck`
 - `npm test`
@@ -17,10 +19,10 @@ Useful validation for this package:
 - `npm run verify`
 - `npm run test:project-control`
 - `npm run groundatlas:fleet`
-- release readback commands in `docs/runbooks/release.md` after any public package publish
+- Prefer the **narrowest** affected check before full workspace runs.
+- Report layers honestly: local diff · trunk FF · deploy · prod proof (do not collapse).
 
-Do not add hosted-service persistence, admin UI, organization approval workflow,
-or customer-specific prompting policy to this beta MCP package without first
-updating the project boundary through an ADR or manifest change.
+## Validation notes
 
-Generated `.groundatlas*` files plus GroundAtlas JSON/Markdown reports are evidence/navigation only. Do not treat them as source of truth.
+- Prefer the **narrowest** affected check before full workspace runs.
+- Report layers honestly: local diff · trunk FF · deploy · prod proof (do not collapse).
