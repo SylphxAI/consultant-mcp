@@ -24,7 +24,7 @@ describe("consultant MCP tool authority routing", () => {
     }
   });
 
-  it("migration ledger marks all four consultant tools as rust_impl (rej-010)", () => {
+  it("migration ledger marks all four consultant tools as ts_deleted (tick036)", () => {
     const ledger = JSON.parse(
       readFileSync(path.join(repoRoot, "docs/specs/consultant-mcp-migration-ledger.json"), "utf8")
     ) as {
@@ -33,17 +33,17 @@ describe("consultant MCP tool authority routing", () => {
 
     for (const toolId of TOOL_IDS) {
       const tool = ledger.capabilities.find((cap) => cap.id === toolId);
-      expect(tool?.state).toBe("rust_impl");
+      expect(tool?.state).toBe("ts_deleted");
     }
   });
 
-  it("tool authority gate script exists and defers authority_rust", () => {
+  it("tool authority gate script enforces sole Rust rmcp tool surface", () => {
     const script = readFileSync(
       path.join(repoRoot, "scripts/check-no-ts-tools-backend.sh"),
       "utf8"
     );
-    expect(script).toContain("rust_impl");
-    expect(script).toContain("rej-010");
+    expect(script).toContain("ts_deleted");
     expect(script).toContain("consultant-core");
+    expect(script).toContain("use_ts_transport");
   });
 });

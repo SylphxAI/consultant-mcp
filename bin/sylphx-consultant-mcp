@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# Consultant MCP launcher — Rust rmcp default (fail-closed).
+# Consultant MCP launcher — Rust rmcp only (fail-closed, no TS fallback).
 # Resolves platform-matched native via optionalDependencies, staged bin/native, or local cargo target.
-# Residual TS adapter: CONSULTANT_MCP_TRANSPORT=ts or argv ts only (explicit opt-in).
 set -euo pipefail
 
 # Resolve this script's directory even when npm installs a .bin symlink.
@@ -17,7 +16,6 @@ resolve_bin_dir() {
 }
 
 ROOT="$(cd "$(resolve_bin_dir)/.." && pwd)"
-TS_ENTRY="$ROOT/dist/server.js"
 
 host_platform_key() {
   local os arch
@@ -158,21 +156,6 @@ resolve_transport() {
   printf '%s\n' "stdio"
 }
 
-use_ts_transport() {
-  [[ "${CONSULTANT_MCP_TRANSPORT:-}" == "ts" ]] || [[ "${1:-}" == "ts" ]]
-}
-
-if use_ts_transport "$@"; then
-  if [[ "${1:-}" == "ts" ]]; then
-    shift
-  fi
-  if [[ ! -f "$TS_ENTRY" ]]; then
-    echo "[sylphx-consultant-mcp] TS adapter missing at dist/server.js — run: npm run build" >&2
-    exit 1
-  fi
-  exec node "$TS_ENTRY" "$@"
-fi
-
 if bin="$(resolve_rust_bin)"; then
   transport="$(resolve_transport)"
   if [[ "$transport" == "http" ]]; then
@@ -192,5 +175,4 @@ else
   echo "[sylphx-consultant-mcp] Unsupported platform for published natives. Supported: darwin-arm64, darwin-x64, linux-x64, linux-arm64." >&2
   echo "[sylphx-consultant-mcp] Build from source: npm run build:rust" >&2
 fi
-echo "[sylphx-consultant-mcp] Residual TS adapter: CONSULTANT_MCP_TRANSPORT=ts (opt-in only)." >&2
 exit 1

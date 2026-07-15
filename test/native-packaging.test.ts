@@ -45,9 +45,8 @@ describe("native Rust packaging gate (S5 rej-010 rust_impl)", () => {
     expect(bin).toContain("is_runnable_native");
     expect(bin).toContain('"$ROOT/bin/native/consultant-mcp-server"');
     expect(bin).toContain("No runnable Rust MCP server");
-    // Residual TS opt-in (CONSULTANT_MCP_TRANSPORT=ts) uses node dist/server.js — dual-path rust_impl.
-    expect(bin).toContain("use_ts_transport");
-    expect(bin).toContain("dist/server.js");
+    expect(bin).not.toContain("use_ts_transport");
+    expect(bin).not.toContain("dist/server.js");
   });
 
   it("stage-rust-mcp copies release binary into bin/native", () => {
@@ -107,7 +106,7 @@ describe("native Rust packaging gate (S5 rej-010 rust_impl)", () => {
     const stdioRust = ledger.capabilities.find(
       (capability) => capability.id === "transport/stdio-rust-rmcp"
     );
-    expect(stdioRust?.state).toBe("rust_impl");
+    expect(stdioRust?.state).toBe("ts_deleted");
     expect(stdioRust?.prodProbe).toContain("check:native-packaging");
   });
 });

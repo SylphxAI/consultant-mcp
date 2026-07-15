@@ -13,14 +13,13 @@ const TOOL_IDS = [
   "tool/consultant.compare_options"
 ] as const;
 
-describe("Consultant MCP tool rust_impl gate (rej-010)", () => {
-  it("check-no-ts-tools-backend gate script enforces rust_impl tools", () => {
+describe("Consultant MCP tool ts_deleted gate", () => {
+  it("check-no-ts-tools-backend gate script enforces Rust tool authority", () => {
     const script = readText("scripts/check-no-ts-tools-backend.sh");
     expect(script).toContain("check-no-ts-tools-backend");
     expect(script).toContain("tool/consultant.review_decision");
     expect(script).toContain("tool/consultant.compare_options");
-    expect(script).toContain("rust_impl");
-    expect(script).toContain("rej-010");
+    expect(script).toContain("ts_deleted");
     expect(script).toContain("transport/stdio-rust-rmcp");
     expect(existsSync(path.join(repoRoot, "test/integration/http-transport.test.ts"))).toBe(true);
     expect(existsSync(path.join(repoRoot, "test/parity.test.ts"))).toBe(true);
@@ -41,21 +40,22 @@ describe("Consultant MCP tool rust_impl gate (rej-010)", () => {
     expect(rustTools).toContain("TOOL_COMPARE_OPTIONS");
     expect(rustCore).toContain("pub async fn run_consultation");
     expect(bin).toContain("resolve_rust_bin");
+    expect(bin).not.toContain("use_ts_transport");
   });
 
-  it("library export surface does not host MCP transport; residual server is opt-in only", () => {
+  it("library export surface does not host MCP transport", () => {
     const tsEntry = readText("src/index.ts");
     expect(tsEntry).not.toMatch(/StdioServerTransport|McpServer|registerTool/);
-    expect(existsSync(path.join(repoRoot, "src/server.ts"))).toBe(true);
+    expect(existsSync(path.join(repoRoot, "src/server.ts"))).toBe(false);
   });
 
-  it("migration ledger marks all four consultant tools as rust_impl", () => {
+  it("migration ledger marks all four consultant tools as ts_deleted", () => {
     const ledger = JSON.parse(readText("docs/specs/consultant-mcp-migration-ledger.json")) as {
       capabilities: Array<{ id: string; state: string }>;
     };
     for (const toolId of TOOL_IDS) {
       const tool = ledger.capabilities.find((capability) => capability.id === toolId);
-      expect(tool?.state).toBe("rust_impl");
+      expect(tool?.state).toBe("ts_deleted");
     }
   });
 

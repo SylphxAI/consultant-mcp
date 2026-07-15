@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Consultant MCP differential parity — TS contract oracle vs native Rust rmcp SSOT.
 # Fail-closed: requires bun (no SKIP-as-pass).
-# rust_impl dual-path slice (rej-010): no authority_rust/ts_deleted promotion.
+# Post-ts_deleted slice: differential proves Rust rmcp parity; no authority_rust promotion.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -30,7 +30,7 @@ npm run build:rust 2>&1 | tee -a "$LOG"
 echo "--- check-no-ts-tools-backend gate (rust_impl) ---" | tee -a "$LOG"
 bash "$REPO_ROOT/scripts/check-no-ts-tools-backend.sh" 2>&1 | tee -a "$LOG"
 
-echo "--- check-no-ts-stdio-backend gate (rust_impl dual-path) ---" | tee -a "$LOG"
+echo "--- check-no-ts-stdio-backend gate (ts_deleted) ---" | tee -a "$LOG"
 bash "$REPO_ROOT/scripts/check-no-ts-stdio-backend.sh" 2>&1 | tee -a "$LOG"
 
 echo "--- check-no-ts-http-backend gate (rust_impl) ---" | tee -a "$LOG"
