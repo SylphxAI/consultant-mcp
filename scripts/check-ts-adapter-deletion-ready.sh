@@ -10,7 +10,7 @@ BIN="$ROOT/bin/sylphx-consultant-mcp"
 require_ledger_state() {
 	local capability="$1"
 	local expected="$2"
-	node - "$LEDGER" "$capability" "$expected" <<'NODE'
+	bun - "$LEDGER" "$capability" "$expected" <<'BUN'
 const [ledgerPath, capability, expected] = process.argv.slice(2);
 const ledger = JSON.parse(require("node:fs").readFileSync(ledgerPath, "utf8"));
 const entry = ledger.capabilities.find((cap) => cap.id === capability);
@@ -24,7 +24,7 @@ if (entry.state !== expected) {
   );
   process.exit(1);
 }
-NODE
+BUN
 }
 
 echo "[check-ts-adapter-deleted] verifying transport/stdio-ts-adapter retirement in ${LEDGER}"

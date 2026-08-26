@@ -170,9 +170,9 @@ pkg="$(platform_package_name 2>/dev/null || true)"
 echo "[sylphx-consultant-mcp] No runnable Rust MCP server for host platform: ${host}" >&2
 if [[ -n "${pkg:-}" ]]; then
   echo "[sylphx-consultant-mcp] Expected optionalDependency package: ${pkg} (consultant-mcp-server binary)." >&2
-  echo "[sylphx-consultant-mcp] Reinstall with optional deps enabled, or run: npm run build:rust" >&2
+  echo "[sylphx-consultant-mcp] Reinstall with optional deps enabled, or from this repository run: bun run build:rust" >&2
 else
   echo "[sylphx-consultant-mcp] Unsupported platform for published natives. Supported: darwin-arm64, darwin-x64, linux-x64, linux-arm64." >&2
-  echo "[sylphx-consultant-mcp] Build from source: npm run build:rust" >&2
+  echo "[sylphx-consultant-mcp] Build from source: bun run build:rust" >&2
 fi
 exit 1

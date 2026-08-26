@@ -244,7 +244,7 @@ fn resolve_mcp_binary() -> PathBuf {
             return candidate;
         }
     }
-    panic!("consultant-mcp-server is not built; run `npm run build:rust`");
+    panic!("consultant-mcp-server is not built; run `bun run build:rust`");
 }
 
 struct StdioMcpClient {

@@ -68,7 +68,7 @@
       {
         "type": "test",
         "name": "Project-control boundary test",
-        "location": "test/project-control.node-test.mjs"
+        "location": "test/project-control.test.mjs"
       },
       {
         "type": "documentation",
@@ -99,7 +99,12 @@
       },
       {
         "repo": "actions/setup-node",
-        "surface": "GitHub Action for Node.js setup used by npm verification and GroundAtlas package execution.",
+        "surface": "GitHub Action for Node.js used only as the customer npm registry/provenance host in the protected release workflow.",
+        "direction": "external"
+      },
+      {
+        "repo": "oven-sh/setup-bun",
+        "surface": "GitHub Action for the company TypeScript toolchain pin Bun 1.4.0.",
         "direction": "external"
       }
     ],
@@ -138,8 +143,8 @@
       "ci",
       "trunk-admission/pass"
     ],
-    "deployPath": "Pull requests and merge groups run .github/workflows/ci.yml with ADR-29 admission contexts, npm run verify, project-control boundary tests, and GroundAtlas package dogfood. Main pushes run CI/postsubmit proof plus .github/workflows/release.yml, which uses GitHub-hosted Actions, organization NPM_TOKEN, npm provenance publish, install smoke, npm registry readback, tag creation, and GitHub release readback for public package releases.",
-    "productionProof": "npm run verify, project-control boundary tests, GroundAtlas package dogfood, PR/merge-group/main CI evidence, dry-run package contents, protected release workflow evidence, npm registry/readback including integrity and attestations, install smoke, and GitHub release readback.",
+    "deployPath": "Pull requests and merge groups run .github/workflows/ci.yml with ADR-29 admission contexts, bun run verify, project-control boundary tests, and GroundAtlas package dogfood. Main pushes run CI/postsubmit proof plus .github/workflows/release.yml, which uses GitHub-hosted Actions, organization NPM_TOKEN, npm provenance publish, install smoke, npm registry readback, tag creation, and GitHub release readback for public package releases.",
+    "productionProof": "bun run verify, project-control boundary tests, GroundAtlas package dogfood, PR/merge-group/main CI evidence, dry-run package contents, protected release workflow evidence, npm registry/readback including integrity and attestations, install smoke, and GitHub release readback.",
     "recoveryClass": "forward-fix-only",
     "deployable": false,
     "packageRelease": {
@@ -147,7 +152,7 @@
       "ecosystems": [
         "npm"
       ],
-      "releaseIntent": "Public package release intent is an already-versioned PR that updates package.json, package-lock.json, and CHANGELOG.md before merge; Changesets files may be used as authoring input only when materialized before merge.",
+      "releaseIntent": "Public package release intent is an already-versioned PR that updates package.json, bun.lock, and CHANGELOG.md before merge; Changesets files may be used as authoring input only when materialized before merge.",
       "versionPr": "Version PRs must carry the version/changelog diff, pass CI/project-control/GroundAtlas gates, and let .github/workflows/release.yml publish the already-versioned package from main.",
       "publisher": ".github/workflows/release.yml is a repo-local protected GitHub Actions publisher using ubuntu-latest, inherited organization NPM_TOKEN, id-token: write, npm publish --provenance, npm registry readback, install smoke, release tag creation, GitHub release readback, and uploaded release evidence.",
       "requiredContexts": [

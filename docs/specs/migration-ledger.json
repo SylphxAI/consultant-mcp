@@ -60,7 +60,7 @@
       "rustSurface": "crates/consultant-mcp-server/src/stdio_transport.rs (rmcp::transport::stdio())",
       "parityTest": "scripts/run-consultant-mcp-differential.sh; cargo test -p consultant-core --test consultant_mcp_differential",
       "notes": "Default bin prefers Rust rmcp stdio when native binary present; residual TS via CONSULTANT_MCP_TRANSPORT=ts. rust_impl only. BW2 tip rebind @ 4f26d5c7ec99 cases=23 httpProbe=4. NO promotions.",
-      "prodProbe": "npm run check:native-packaging; bin/native/consultant-mcp-server staged for npm pack",
+      "prodProbe": "bun run check:native-packaging; bin/native/consultant-mcp-server staged for npm pack",
       "proof": {
         "status": "differential_green",
         "baselineTsSha": "47b246ba7239c85053e2f0a79f888fbaf814c9e0",

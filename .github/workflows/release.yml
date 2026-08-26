@@ -85,7 +85,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.0"
+
       - name: Set up Node.js for npm registry
+        # Customer installer/registry host for provenance publish, npm view,
+        # and consumer install smoke. Not the company TypeScript toolchain.
         uses: actions/setup-node@v5
         with:
           node-version: "22.14.0"
@@ -97,9 +104,10 @@ jobs:
           npm --version
 
       - name: Install dependencies
-        # npm install (not ci): platform optionalDeps may be unpublished while
-        # this Release job is assembling/publishing them from matrix artifacts.
-        run: npm install --no-fund --no-audit
+        # Frozen bun.lock is company install authority. Platform optional
+        # packages may be unpublished while this job assembles them; they stay
+        # optional and must not restore npm as the TypeScript toolchain.
+        run: bun install --frozen-lockfile
 
       - uses: dtolnay/rust-toolchain@stable
 
@@ -114,8 +122,8 @@ jobs:
           set -euo pipefail
           echo "== multi-arch artifacts =="
           ls -laR artifacts || true
-          npm run assemble:multiarch
-          npm run sync:platform-versions
+          bun run assemble:multiarch
+          bun run sync:platform-versions
           for dir in npm/*/; do
             test -f "${dir}package.json"
             test -x "${dir}consultant-mcp-server"
@@ -134,23 +142,23 @@ jobs:
         run: |
           set -euo pipefail
           # Host build keeps cargo tests / verify path green; multi-arch already assembled.
-          npm run build:rust
+          bun run build:rust
           # Re-stage linux multiarch binary after host rebuild so pack matches release natives
           cp npm/linux-x64-gnu/consultant-mcp-server bin/native/consultant-mcp-server
           chmod +x bin/native/consultant-mcp-server
-          npm run verify
+          bun run verify
 
       - name: Test project-control boundary
-        run: npm run test:project-control
+        run: bun run test:project-control
 
       - name: GroundAtlas release dogfood
         run: |
-          npm exec --yes --package groundatlas@0.1.3 -- ga update --out .groundatlas-pilot
-          npm exec --yes --package groundatlas@0.1.3 -- ga manifest --out .groundatlas-pilot --json | tee "$RUNNER_TEMP/groundatlas-release-manifest.json"
-          npm exec --yes --package groundatlas@0.1.3 -- ga audit --out .groundatlas-pilot
-          npm exec --yes --package groundatlas@0.1.3 -- ga fleet . --out .groundatlas-pilot --require-atlas --strict --json | tee "$RUNNER_TEMP/groundatlas-release-fleet.json"
-          npm exec --yes --package groundatlas@0.1.3 -- ga fleet . --out .groundatlas-pilot --require-atlas --strict | tee "$RUNNER_TEMP/groundatlas-release-fleet.md"
-          node - <<'NODE'
+          bun x --bun groundatlas@0.1.3 ga update --out .groundatlas-pilot
+          bun x --bun groundatlas@0.1.3 ga manifest --out .groundatlas-pilot --json | tee "$RUNNER_TEMP/groundatlas-release-manifest.json"
+          bun x --bun groundatlas@0.1.3 ga audit --out .groundatlas-pilot
+          bun x --bun groundatlas@0.1.3 ga fleet . --out .groundatlas-pilot --require-atlas --strict --json | tee "$RUNNER_TEMP/groundatlas-release-fleet.json"
+          bun x --bun groundatlas@0.1.3 ga fleet . --out .groundatlas-pilot --require-atlas --strict | tee "$RUNNER_TEMP/groundatlas-release-fleet.md"
+          bun - <<'BUN'
           const { readFileSync } = require("node:fs");
           const manifest = JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/groundatlas-release-manifest.json`, "utf8"));
           const fleet = JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/groundatlas-release-fleet.json`, "utf8"));
@@ -158,15 +166,15 @@ jobs:
           if (manifest.selected?.path !== "project.manifest.json" || manifest.selected?.adapter !== false) throw new Error("GroundAtlas release manifest gate failed");
           if (fleet.summary.adopted !== 1 || fleet.summary.blocked !== 0 || fleet.summary.warning !== 0 || fleet.summary.total !== 1) throw new Error("GroundAtlas release fleet gate failed");
           if (!fleetMarkdown.includes("# GroundAtlas fleet adoption report") || !fleetMarkdown.includes("Summary: 1 adopted, 0 warning, 0 blocked, 1 total.")) throw new Error("GroundAtlas release Markdown scorecard gate failed");
-          NODE
+          BUN
 
       - name: Resolve package release state
         id: pkg
         shell: bash
         run: |
           set -euo pipefail
-          name=$(node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).name")
-          version=$(node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).version")
+          name=$(bun -e "const p=require('./package.json'); process.stdout.write(p.name)")
+          version=$(bun -e "const p=require('./package.json'); process.stdout.write(p.version)")
           tag="v${version}"
           echo "name=${name}" >> "$GITHUB_OUTPUT"
           echo "version=${version}" >> "$GITHUB_OUTPUT"
@@ -197,8 +205,8 @@ jobs:
         run: |
           set -euo pipefail
           for dir in npm/*/; do
-            pkg_name=$(node -p "JSON.parse(require('node:fs').readFileSync('${dir}package.json', 'utf8')).name")
-            pkg_ver=$(node -p "JSON.parse(require('node:fs').readFileSync('${dir}package.json', 'utf8')).version")
+            pkg_name=$(bun -e "const p=require('./${dir}package.json'); process.stdout.write(p.name)")
+            pkg_ver=$(bun -e "const p=require('./${dir}package.json'); process.stdout.write(p.version)")
             test -x "${dir}consultant-mcp-server"
             if npm view "${pkg_name}@${pkg_ver}" version --json >/dev/null 2>&1; then
               echo "SKIP already published ${pkg_name}@${pkg_ver}"
@@ -233,7 +241,7 @@ jobs:
             echo "npm registry readback attempt ${attempt}/40"
             if npm view "${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}" version dist-tags time gitHead dist.integrity dist.attestations --json > "$RUNNER_TEMP/npm-readback.json"; then
               cat "$RUNNER_TEMP/npm-readback.json"
-              node -e "const r=require(process.env.RUNNER_TEMP + '/npm-readback.json'); if (r.version !== '${{ steps.pkg.outputs.version }}') throw new Error('npm readback version mismatch')"
+              bun -e "const r=require(process.env.RUNNER_TEMP + '/npm-readback.json'); if (r.version !== '${{ steps.pkg.outputs.version }}') throw new Error('npm readback version mismatch')"
               break
             fi
             if [[ "$attempt" -eq 40 ]]; then
@@ -243,7 +251,7 @@ jobs:
             sleep 10
           done
           # Fail-closed multi-arch platform package readback (tarball + retries)
-          npm run verify:multiarch-readback
+          bun run verify:multiarch-readback
 
       - name: Smoke installed package
         shell: bash

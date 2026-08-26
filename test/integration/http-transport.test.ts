@@ -7,7 +7,7 @@ import { type ChildProcess, execSync, spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import net from "node:net";
 import path from "node:path";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { hashRequest } from "../../src/policy.js";
 import type { ConsultationRequest, ConsultationResult } from "../../src/types.js";
 
@@ -169,7 +169,7 @@ describe("MCP Server HTTP Transport Integration (Rust rmcp)", () => {
   let serverProc: ChildProcess;
 
   beforeAll(async () => {
-    execSync("npm run build:rust", { cwd: repoRoot, stdio: "pipe", timeout: 300_000 });
+    execSync("bun run build:rust", { cwd: repoRoot, stdio: "pipe", timeout: 300_000 });
 
     const testPort = await getFreePort();
     baseUrl = `http://${TEST_HOST}:${String(testPort)}/mcp`;
@@ -282,7 +282,7 @@ describe("MCP Server HTTP Transport Authentication (Rust rmcp)", () => {
   let authBaseUrl: string;
 
   beforeAll(async () => {
-    execSync("npm run build:rust", { cwd: repoRoot, stdio: "pipe", timeout: 300_000 });
+    execSync("bun run build:rust", { cwd: repoRoot, stdio: "pipe", timeout: 300_000 });
 
     const testPort = await getFreePort();
     authBaseUrl = `http://${TEST_HOST}:${String(testPort)}/mcp`;

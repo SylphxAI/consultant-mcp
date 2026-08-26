@@ -31,36 +31,35 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v5
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: "22.14.0"
-          cache: npm
+          bun-version: "1.4.0"
 
       - name: Install dependencies
-        # Use npm install (not ci): platform optionalDependencies may be
-        # unpublished during self-build and leave the lockfile without package
-        # entries; npm ci fails closed, while npm install skips missing optional.
-        run: npm install --no-fund --no-audit
+        # Frozen bun.lock is install authority. Missing platform
+        # optionalDependencies remain optional and must not restore npm as the
+        # company TypeScript toolchain.
+        run: bun install --frozen-lockfile
 
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
 
       - name: Build and stage Rust MCP server for npm packaging
-        run: npm run build:rust
+        run: bun run build:rust
 
       - name: Verify package
-        run: npm run verify
+        run: bun run verify
 
       - name: TS stdio adapter deletion gate (transport/stdio-ts-adapter ts_deleted)
-        run: npm run check:ts-adapter-deleted
+        run: bun run check:ts-adapter-deleted
 
       - name: Rust clippy (no warnings)
         run: cargo clippy --all-targets -- -D warnings
 
       - name: Test project-control boundary
-        run: npm run test:project-control
+        run: bun run test:project-control
 
       - name: GroundAtlas package dogfood
         id: groundatlas
@@ -73,7 +72,7 @@ jobs:
 
       - name: Assert GroundAtlas truth boundary
         run: |
-          node - "${{ steps.groundatlas.outputs.manifest-report-path }}" "${{ steps.groundatlas.outputs.fleet-report-path }}" "${{ steps.groundatlas.outputs.fleet-markdown-report-path }}" <<'NODE'
+          bun - "${{ steps.groundatlas.outputs.manifest-report-path }}" "${{ steps.groundatlas.outputs.fleet-report-path }}" "${{ steps.groundatlas.outputs.fleet-markdown-report-path }}" <<'BUN'
           const [manifestPath, fleetPath, fleetMarkdownPath] = process.argv.slice(2);
           const { readFileSync } = require("node:fs");
           const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
@@ -94,7 +93,7 @@ jobs:
           assert(project?.manifestAdapters?.some((adapter) => adapter.path === ".doctrine/project.json" && adapter.adapter === true), "Fleet report must keep .doctrine/project.json as an adapter.");
           assert(fleetMarkdown.includes("# GroundAtlas fleet adoption report"), "Markdown fleet scorecard must include the report title.");
           assert(fleetMarkdown.includes("Summary: 1 adopted, 0 warning, 0 blocked, 1 total."), "Markdown fleet scorecard must include the adopted summary.");
-          NODE
+          BUN
 
       - name: Upload GroundAtlas reports
         if: always()

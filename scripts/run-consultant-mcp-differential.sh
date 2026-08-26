@@ -22,10 +22,10 @@ fi
 echo "=== consultant-mcp differential parity $(date -Iseconds) ===" | tee -a "$LOG"
 
 echo "--- build TypeScript library (oracle imports src/) ---" | tee -a "$LOG"
-npm run build 2>&1 | tee -a "$LOG"
+bun run build 2>&1 | tee -a "$LOG"
 
 echo "--- build Rust rmcp server ---" | tee -a "$LOG"
-npm run build:rust 2>&1 | tee -a "$LOG"
+bun run build:rust 2>&1 | tee -a "$LOG"
 
 echo "--- check-no-ts-tools-backend gate (rust_impl) ---" | tee -a "$LOG"
 bash "$REPO_ROOT/scripts/check-no-ts-tools-backend.sh" 2>&1 | tee -a "$LOG"

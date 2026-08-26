@@ -23,7 +23,7 @@ if [[ -f "${ROOT}/src/server.ts" ]]; then
 fi
 
 if [[ -f "${LEDGER}" ]]; then
-node - "${LEDGER}" <<'NODE'
+bun - "${LEDGER}" <<'BUN'
 const [ledgerPath] = process.argv.slice(2);
 const ledger = JSON.parse(require("node:fs").readFileSync(ledgerPath, "utf8"));
 const http = ledger.capabilities.find((cap) => cap.id === "transport/web-mcp-http");
@@ -33,7 +33,7 @@ if (!allowed.has(http.state)) {
   console.error(`transport/web-mcp-http is ${http.state}; expected rust_impl+ or ts_deleted`);
   process.exit(1);
 }
-NODE
+BUN
 fi
 
 if [[ -f "${BIN}" ]]; then

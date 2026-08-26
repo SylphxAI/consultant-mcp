@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "bun:test";
 
 const repoRoot = path.resolve(import.meta.dirname, "..");
 
@@ -13,8 +13,8 @@ describe("native Rust packaging gate (S5 rej-010 rust_impl)", () => {
 
     expect(script).toContain("check-native-packaging");
     expect(script).toContain("bin/native/consultant-mcp-server");
-    expect(script).toContain("npm run build:rust");
-    expect(script).toContain("npm pack");
+    expect(script).toContain("bun run build:rust");
+    expect(script).toContain("bun pm pack");
     expect(script).toContain("package/bin/native/consultant-mcp-server");
     expect(script).toContain("rej-010");
   });
@@ -63,7 +63,7 @@ describe("native Rust packaging gate (S5 rej-010 rust_impl)", () => {
     const workflow = readText(".github/workflows/release.yml");
 
     expect(workflow).toContain("dtolnay/rust-toolchain@stable");
-    expect(workflow).toContain("npm run build:rust");
+    expect(workflow).toContain("bun run build:rust");
     expect(workflow).toContain("bin/native/consultant-mcp-server");
     expect(workflow).toContain("assemble:multiarch");
     expect(workflow).toContain("consultant-native-");

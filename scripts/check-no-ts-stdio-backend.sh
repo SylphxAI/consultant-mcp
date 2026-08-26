@@ -30,7 +30,7 @@ if [[ -f "${ROOT}/dist/server.js" ]]; then
 fi
 
 if [[ -f "${LEDGER}" ]]; then
-node - "${LEDGER}" <<'NODE'
+bun - "${LEDGER}" <<'BUN'
 const [ledgerPath] = process.argv.slice(2);
 const ledger = JSON.parse(require("node:fs").readFileSync(ledgerPath, "utf8"));
 const stdioRust = ledger.capabilities.find((cap) => cap.id === "transport/stdio-rust-rmcp");
@@ -52,7 +52,7 @@ if (tsAdapter.state !== "ts_deleted") {
   console.error(`transport/stdio-ts-adapter is ${tsAdapter.state}; expected ts_deleted`);
   process.exit(1);
 }
-NODE
+BUN
 fi
 
 if [[ -f "${BIN}" ]]; then
