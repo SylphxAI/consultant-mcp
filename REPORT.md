@@ -72,10 +72,10 @@ Environment variables:
 Required validation commands:
 
 ```bash
-npm run typecheck
-npm test
-npm run build
-npm run pack:beta
+bun run typecheck
+bun test
+bun run build
+bun run pack:beta
 npm pack
 ```
 

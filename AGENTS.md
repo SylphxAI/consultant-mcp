@@ -12,13 +12,13 @@ Local truth: `PROJECT.md`, `.doctrine/project.json` when present.
 
 ## Local commands
 
-- `npm run typecheck`
-- `npm test`
-- `npm run build`
-- `npm run pack:beta`
-- `npm run verify`
-- `npm run test:project-control`
-- `npm run groundatlas:fleet`
+- `bun run typecheck`
+- `bun test`
+- `bun run build`
+- `bun run pack:beta`
+- `bun run verify`
+- `bun run test:project-control`
+- `bun run groundatlas:fleet`
 - Prefer the **narrowest** affected check before full workspace runs.
 - Report layers honestly: local diff · trunk FF · deploy · prod proof (do not collapse).
 

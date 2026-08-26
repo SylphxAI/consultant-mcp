@@ -8,7 +8,7 @@ const target = path.join(targetDir, "consultant-mcp-server");
 
 if (!fs.existsSync(source)) {
   console.error(
-    `[stage-rust-mcp] Missing release binary at ${source}. Run: npm run build:rust`
+    `[stage-rust-mcp] Missing release binary at ${source}. Run: bun run build:rust`
   );
   process.exit(1);
 }

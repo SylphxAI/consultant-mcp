@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "bun:test";
 import { runConsultation } from "../src/engine.js";
 import { hashRequest } from "../src/policy.js";
 import { MockModelClient } from "../src/providers/openrouter.js";

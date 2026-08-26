@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # rej-010 rust_impl packaging gate: published npm tarballs must ship the prebuilt
-# Rust MCP server at bin/native/consultant-mcp-server (staged via npm run build:rust).
+# Rust MCP server at bin/native/consultant-mcp-server (staged via bun run build:rust).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -30,7 +30,7 @@ if ! grep -q 'bin/native' "${PACKAGE_JSON}"; then
 fi
 
 if [[ ! -f "${NATIVE}" ]]; then
-  report_violation "missing bin/native/consultant-mcp-server — run: npm run build:rust"
+  report_violation "missing bin/native/consultant-mcp-server — run: bun run build:rust"
 elif [[ ! -x "${NATIVE}" ]]; then
   report_violation "bin/native/consultant-mcp-server is not executable"
 fi
@@ -40,9 +40,9 @@ if [[ "${violations}" -eq 0 ]]; then
   cleanup() { rm -rf "${tmp}"; }
   trap cleanup EXIT
 
-  # Force-include gitignored staged native binary for npm pack.
-  # npm respects .gitignore unless overridden; package.json "files" is not always enough
-  # for nested gitignored paths on all npm versions.
+  # Force-include gitignored staged native binary for bun pm pack / npm tarball.
+  # packers may respect .gitignore unless overridden; package.json "files" is not always enough
+  # for nested gitignored paths.
   NPMIGNORE="${ROOT}/.npmignore"
   NPMIGNORE_CREATED=0
   if [[ ! -f "${NPMIGNORE}" ]]; then
@@ -62,15 +62,15 @@ IGNORE
     NPMIGNORE_CREATED=1
   fi
 
-  pack_out="$(cd "${ROOT}" && npm pack --pack-destination "${tmp}" 2>&1)" || {
+  pack_out="$(cd "${ROOT}" && bun pm pack --destination "${tmp}" 2>&1)" || {
     echo "$pack_out"
-    report_violation "npm pack failed"
+    report_violation "bun pm pack failed"
   }
   echo "$pack_out" | tail -n 5
 
   pkg_tgz="$(find "${tmp}" -maxdepth 1 -type f -name '*.tgz' | head -n 1 || true)"
   if [[ -z "${pkg_tgz}" || ! -f "${pkg_tgz}" ]]; then
-    # Fallback: basename from npm pack stdout last line
+    # Fallback: basename from bun pm pack stdout last line
     base="$(echo "$pack_out" | tail -n 1 | tr -d '[:space:]')"
     if [[ -n "$base" && -f "${tmp}/${base}" ]]; then
       pkg_tgz="${tmp}/${base}"
@@ -78,20 +78,20 @@ IGNORE
   fi
 
   if [[ -z "${pkg_tgz}" || ! -f "${pkg_tgz}" ]]; then
-    report_violation "npm pack did not produce a tarball"
+    report_violation "bun pm pack did not produce a tarball"
   else
     listing="$(tar -tzf "${pkg_tgz}" || true)"
     if ! printf '%s\n' "${listing}" | grep -E '(^|/)package/bin/native/consultant-mcp-server$' >/dev/null; then
       if ! printf '%s\n' "${listing}" | grep -E 'bin/native/consultant-mcp-server' >/dev/null; then
         echo "--- tarball listing (first 80) ---"
         printf '%s\n' "${listing}" | head -n 80
-        report_violation "npm pack tarball missing package/bin/native/consultant-mcp-server"
+        report_violation "pack tarball missing package/bin/native/consultant-mcp-server"
       fi
     fi
     if ! printf '%s\n' "${listing}" | grep -E 'bin/sylphx-consultant-mcp' >/dev/null; then
       echo "--- tarball listing (first 80) ---"
       printf '%s\n' "${listing}" | head -n 80
-      report_violation "npm pack tarball missing package/bin/sylphx-consultant-mcp"
+      report_violation "pack tarball missing package/bin/sylphx-consultant-mcp"
     fi
   fi
 
@@ -106,4 +106,4 @@ if [[ "${violations}" -gt 0 ]]; then
   exit 1
 fi
 
-echo "PASS: native Rust MCP server is staged and included in npm pack output."
+echo "PASS: native Rust MCP server is staged and included in the customer npm tarball produced by bun pm pack."

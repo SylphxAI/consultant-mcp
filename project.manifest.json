@@ -36,7 +36,7 @@
     "source": [
       "src/",
       "package.json",
-      "package-lock.json",
+      "bun.lock",
       "tsconfig.json",
       ".github/workflows/ci.yml",
       ".github/workflows/release.yml",
@@ -45,7 +45,7 @@
     ],
     "tests": [
       "src/__tests__/",
-      "test/project-control.node-test.mjs",
+      "test/project-control.test.mjs",
       ".github/workflows/ci.yml",
       ".github/workflows/release.yml"
     ],
@@ -99,7 +99,7 @@
       "type": "workflow",
       "name": "CI/admission",
       "path": ".github/workflows/ci.yml",
-      "description": "ADR-29 admission, npm package verification, project-control tests, and GroundAtlas package dogfood."
+      "description": "ADR-29 admission, Bun-locked package verification, project-control tests, and GroundAtlas package dogfood."
     },
     {
       "type": "docs",
@@ -123,22 +123,22 @@
   "commands": [
     {
       "name": "install",
-      "command": "npm ci",
-      "purpose": "Install locked npm dependencies without lockfile drift."
+      "command": "bun install --frozen-lockfile",
+      "purpose": "Install locked Bun dependencies without lockfile drift."
     },
     {
       "name": "verify",
-      "command": "npm run verify",
+      "command": "bun run verify",
       "purpose": "Run typecheck, tests, build, and dry-run npm package verification."
     },
     {
       "name": "test:project-control",
-      "command": "npm run test:project-control",
+      "command": "bun run test:project-control",
       "purpose": "Verify neutral manifest, Doctrine adapter, CI gate, and package-publication boundary."
     },
     {
       "name": "groundatlas:fleet",
-      "command": "npm run groundatlas:fleet",
+      "command": "bun run groundatlas:fleet",
       "purpose": "Prove the vendor-neutral manifest is selected and generated GroundAtlas files are navigation-only."
     },
     {

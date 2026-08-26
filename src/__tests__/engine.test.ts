@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "bun:test";
 import { runConsultation } from "../engine.js";
 import { MockModelClient } from "../providers/openrouter.js";
 import type { ConsultantConfig, ReviewDecisionRequest } from "../types.js";

@@ -105,14 +105,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v5
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: "22.14.0"
+          bun-version: "1.4.0"
 
       - name: Install dependencies
-        # npm install (not ci): platform optionalDeps are produced here, not fetched.
-        run: npm install --no-fund --no-audit
+        run: bun install --frozen-lockfile
 
       - name: Download all native artifacts
         uses: actions/download-artifact@v4
@@ -121,7 +120,7 @@ jobs:
           pattern: consultant-native-*
 
       - name: Assemble platform packages (fail-closed)
-        run: npm run assemble:multiarch
+        run: bun run assemble:multiarch
 
       - name: List assembled packages
         run: |

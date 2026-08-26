@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
-import test from 'node:test'
+import { test } from 'bun:test'
 
 const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'))
 const readText = (path) => readFileSync(path, 'utf8')
@@ -46,13 +46,16 @@ test('Doctrine adapter remains Sylphx-specific and package publication boundary 
 test('CI verifies the package and dogfoods the released GroundAtlas package/action', () => {
   const workflow = readText('.github/workflows/ci.yml')
 
+  assert.ok(workflow.includes('oven-sh/setup-bun@v2'), 'CI must set up Bun via oven-sh/setup-bun')
+  assert.ok(workflow.includes('bun-version: "1.4.0"'), 'CI must pin exact Bun 1.4.0')
   assert.ok(
-    workflow.includes('npm install') || workflow.includes('npm ci'),
-    'CI must install dependencies via npm install or npm ci'
+    workflow.includes('bun install --frozen-lockfile'),
+    'CI must install from frozen bun.lock'
   )
-  assert.ok(workflow.includes('npm run build:rust'))
-  assert.ok(workflow.includes('npm run verify'))
-  assert.ok(workflow.includes('npm run test:project-control'))
+  assert.ok(!workflow.includes('actions/setup-node'), 'CI must not use Node as the company TypeScript toolchain')
+  assert.ok(workflow.includes('bun run build:rust'))
+  assert.ok(workflow.includes('bun run verify'))
+  assert.ok(workflow.includes('bun run test:project-control'))
   assert.ok(workflow.includes('uses: SylphxAI/groundatlas@v0.1.3'))
   assert.ok(workflow.includes('package-spec: groundatlas@0.1.3'))
   assert.ok(workflow.includes('require-atlas: "true"'))
@@ -66,44 +69,50 @@ test('CI verifies the package and dogfoods the released GroundAtlas package/acti
 test('package scripts expose reproducible local gates and protected publication metadata', () => {
   const pkg = readJson('package.json')
 
+  assert.equal(pkg.packageManager, 'bun@1.4.0')
+  assert.equal(pkg.engines.bun, '>=1.4.0')
+  assert.equal(pkg.engines.node, undefined)
   assert.equal(
     pkg.scripts.verify,
-    'npm run typecheck && npm test && npm run build && npm run test:rust && npm run test:parity && npm run test:http-transport && npm run pack:beta'
+    'bun run typecheck && bun run test && bun run build && bun run test:rust && bun run test:parity && bun run test:http-transport && bun run check:ts-adapter-deleted && bun run pack:beta'
   )
   assert.equal(pkg.scripts['check:native-packaging'], 'bash scripts/check-native-packaging.sh')
-  assert.equal(pkg.scripts.prepublishOnly, 'npm run build:rust')
+  assert.equal(pkg.scripts.prepublishOnly, 'bun run build:rust')
   assert.ok(pkg.files.includes('bin/native'))
-  assert.equal(pkg.scripts['test:project-control'], 'node --test test/project-control.node-test.mjs')
+  assert.equal(pkg.scripts['test:project-control'], 'bun test test/project-control.test.mjs')
   assert.equal(
     pkg.scripts['groundatlas:fleet'],
-    'npm exec --yes --package groundatlas@0.1.3 -- ga fleet . --out .groundatlas-pilot --require-atlas --strict --json'
+    'bun x --bun groundatlas@0.1.3 ga fleet . --out .groundatlas-pilot --require-atlas --strict --json'
   )
   assert.equal(pkg.scripts['changeset:publish'], undefined)
-  assert.match(pkg.packageManager, /^npm@/)
   assert.equal(pkg.publishConfig.access, 'public')
   assert.equal(pkg.publishConfig.provenance, true)
-  assert.equal(readJson('package-lock.json').packages[''].version, pkg.version)
+  assert.equal(existsSync('bun.lock'), true)
+  assert.equal(existsSync('package-lock.json'), false)
   assert.equal(existsSync('CHANGELOG.md'), true)
   assert.equal(existsSync('.github/workflows/release.yml'), true)
   assert.equal(existsSync('.changeset/config.json'), true)
 })
 
-test('release workflow uses protected Sylphx npm publication path', () => {
+test('release workflow uses Bun for company TypeScript and npm only as customer registry host', () => {
   const workflow = readText('.github/workflows/release.yml')
 
   assert.ok(workflow.includes('push:'))
   assert.ok(workflow.includes('branches: [main]'))
   assert.ok(workflow.includes('runs-on: ubuntu-latest'))
   assert.ok(workflow.includes('id-token: write'))
+  assert.ok(workflow.includes('oven-sh/setup-bun@v2'))
+  assert.ok(workflow.includes('bun-version: "1.4.0"'))
+  assert.ok(workflow.includes('bun install --frozen-lockfile'))
   assert.ok(workflow.includes('npm install --global npm@^11.5.1'))
   assert.ok(workflow.includes('dtolnay/rust-toolchain@stable'))
-  assert.ok(workflow.includes('npm run build:rust'))
-  assert.ok(workflow.includes('npm run verify'))
-  assert.ok(workflow.includes('npm run test:project-control'))
+  assert.ok(workflow.includes('bun run build:rust'))
+  assert.ok(workflow.includes('bun run verify'))
+  assert.ok(workflow.includes('bun run test:project-control'))
   assert.ok(workflow.includes('bin/native/consultant-mcp-server'))
-  assert.ok(workflow.includes('npm exec --yes --package groundatlas@0.1.3 -- ga update --out .groundatlas-pilot'))
-  assert.ok(workflow.includes('npm exec --yes --package groundatlas@0.1.3 -- ga manifest --out .groundatlas-pilot --json'))
-  assert.ok(workflow.includes('npm exec --yes --package groundatlas@0.1.3 -- ga audit --out .groundatlas-pilot'))
+  assert.ok(workflow.includes('bun x --bun groundatlas@0.1.3 ga update --out .groundatlas-pilot'))
+  assert.ok(workflow.includes('bun x --bun groundatlas@0.1.3 ga manifest --out .groundatlas-pilot --json'))
+  assert.ok(workflow.includes('bun x --bun groundatlas@0.1.3 ga audit --out .groundatlas-pilot'))
   assert.ok(workflow.includes('groundatlas-release-fleet.md'))
   assert.ok(workflow.includes('npm publish --access public --provenance'))
   assert.ok(workflow.includes('npm registry readback attempt'))

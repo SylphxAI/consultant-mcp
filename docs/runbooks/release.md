@@ -13,7 +13,7 @@
 
 ## Normal release path
 
-1. Commit the intended `package.json` / `package-lock.json` version and `CHANGELOG.md` entry in a release PR. A Changesets file may be used as the authoring format, but the version/changelog diff must be materialized before merge.
+1. Commit the intended `package.json` / `bun.lock` version and `CHANGELOG.md` entry in a release PR. A Changesets file may be used as the authoring format, but the version/changelog diff must be materialized before merge.
 2. Merge the release PR only after CI, project-control tests, and GroundAtlas dogfood pass.
 3. Let `.github/workflows/release.yml` publish the already-versioned package from `main`.
 4. Verify the publish from npm, install smoke, tag readback, and GitHub release readback.
