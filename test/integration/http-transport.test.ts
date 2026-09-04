@@ -13,6 +13,8 @@ import type { ConsultationRequest, ConsultationResult } from "../../src/types.js
 
 const repoRoot = path.resolve(import.meta.dirname, "../..");
 const binWrapper = path.join(repoRoot, "bin/sylphx-consultant-mcp");
+const stagedRustBin = path.join(repoRoot, "bin/native/consultant-mcp-server");
+// Pin the candidate binary. After bun install the launcher prefers published optionalDep.
 const RUST_HTTP_READY = "Streamable HTTP MCP listening on http://";
 const TEST_HOST = "127.0.0.1";
 
@@ -48,6 +50,7 @@ const packageJson = JSON.parse(
 ) as { version: string };
 
 let baseUrl: string;
+let testPort: number;
 
 const getFreePort = async (): Promise<number> =>
   new Promise((resolve, reject) => {
@@ -86,6 +89,121 @@ const parseMcpResponse = async (response: Response) => {
     .map((line) => line.slice("data:".length).trim())
     .filter((line) => line.length > 0);
 
+  const payload = dataLines.at(-1);
+  if (!payload) {
+    throw new SyntaxError(`No MCP JSON payload in streamable HTTP response: ${body.slice(0, 200)}`);
+  }
+  return JSON.parse(payload) as Record<string, unknown>;
+};
+
+const initializeParams = {
+  protocolVersion: "2024-11-05",
+  capabilities: {},
+  clientInfo: { name: "test-http-client", version: "1.0.0" }
+};
+
+const decodeChunkedBody = (chunked: string): string => {
+  let rest = chunked;
+  let body = "";
+  while (rest.length > 0) {
+    const lineEnd = rest.indexOf("\r\n");
+    if (lineEnd < 0) {
+      break;
+    }
+    const size = Number.parseInt(rest.slice(0, lineEnd), 16);
+    if (!Number.isFinite(size) || size < 0) {
+      break;
+    }
+    if (size === 0) {
+      break;
+    }
+    const dataStart = lineEnd + 2;
+    body += rest.slice(dataStart, dataStart + size);
+    rest = rest.slice(dataStart + size + 2);
+  }
+  return body;
+};
+
+const parseRawHttpResponse = (raw: string): { status: number; contentType: string; body: string } => {
+  const headerEnd = raw.indexOf("\r\n\r\n");
+  if (headerEnd < 0) {
+    throw new SyntaxError(`Incomplete HTTP response: ${raw.slice(0, 200)}`);
+  }
+  const headerText = raw.slice(0, headerEnd);
+  let body = raw.slice(headerEnd + 4);
+  const lines = headerText.split("\r\n");
+  const status = Number(lines[0]?.split(" ")[1] ?? 0);
+  const headers = new Map<string, string>();
+  for (const line of lines.slice(1)) {
+    const idx = line.indexOf(":");
+    if (idx > 0) {
+      headers.set(line.slice(0, idx).trim().toLowerCase(), line.slice(idx + 1).trim());
+    }
+  }
+  const contentType = headers.get("content-type") ?? "";
+  if ((headers.get("transfer-encoding") ?? "").toLowerCase().includes("chunked")) {
+    body = decodeChunkedBody(body);
+  }
+  return { status, contentType, body };
+};
+
+// Raw HTTP/1.1 so the Host header is on the wire. Bun fetch/node:http may drop Host,
+// which makes rmcp fall back to the loopback :authority and falsely return 200.
+const postMcpWithHost = (
+  port: number,
+  hostHeader: string,
+  body: Record<string, unknown>
+): Promise<{ status: number; contentType: string; body: string }> =>
+  new Promise((resolve, reject) => {
+    const payload = JSON.stringify(body);
+    const request = [
+      "POST /mcp HTTP/1.1",
+      `Host: ${hostHeader}`,
+      "Content-Type: application/json",
+      "Accept: application/json, text/event-stream",
+      `Content-Length: ${Buffer.byteLength(payload)}`,
+      "Connection: close",
+      "",
+      payload
+    ].join("\r\n");
+
+    const socket = net.createConnection({ host: TEST_HOST, port });
+    const chunks: Buffer[] = [];
+    const timeout = setTimeout(() => {
+      socket.destroy();
+      reject(new Error(`Timed out waiting for MCP HTTP response with Host ${hostHeader}`));
+    }, 10_000);
+
+    socket.on("connect", () => {
+      socket.write(request);
+    });
+    socket.on("data", (chunk: Buffer) => {
+      chunks.push(chunk);
+    });
+    socket.on("end", () => {
+      clearTimeout(timeout);
+      try {
+        resolve(parseRawHttpResponse(Buffer.concat(chunks).toString("utf8")));
+      } catch (error) {
+        reject(error);
+      }
+    });
+    socket.on("error", (error) => {
+      clearTimeout(timeout);
+      reject(error);
+    });
+  });
+
+const parseMcpPayload = (contentType: string, body: string) => {
+  if (contentType.includes("application/json")) {
+    return JSON.parse(body) as Record<string, unknown>;
+  }
+  const dataLines = body
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith("data:"))
+    .map((line) => line.slice("data:".length).trim())
+    .filter((line) => line.length > 0);
   const payload = dataLines.at(-1);
   if (!payload) {
     throw new SyntaxError(`No MCP JSON payload in streamable HTTP response: ${body.slice(0, 200)}`);
@@ -171,7 +289,7 @@ describe("MCP Server HTTP Transport Integration (Rust rmcp)", () => {
   beforeAll(async () => {
     execSync("bun run build:rust", { cwd: repoRoot, stdio: "pipe", timeout: 300_000 });
 
-    const testPort = await getFreePort();
+    testPort = await getFreePort();
     baseUrl = `http://${TEST_HOST}:${String(testPort)}/mcp`;
     serverProc = spawn(binWrapper, [], {
       stdio: ["pipe", "pipe", "pipe"],
@@ -179,6 +297,7 @@ describe("MCP Server HTTP Transport Integration (Rust rmcp)", () => {
         ...process.env,
         NODE_ENV: "test",
         CONSULTANT_MOCK: "true",
+        CONSULTANT_MCP_RUST_BIN: stagedRustBin,
         MCP_TRANSPORT: "http",
         MCP_HTTP_PORT: testPort.toString(),
         MCP_HTTP_HOST: TEST_HOST
@@ -262,6 +381,32 @@ describe("MCP Server HTTP Transport Integration (Rust rmcp)", () => {
     });
   }
 
+  it("rejects Streamable HTTP initialize when Host is not on the allowlist", async () => {
+    const denied = await postMcpWithHost(testPort, "evil.example", {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "initialize",
+      params: initializeParams
+    });
+    expect(denied.status).toBe(403);
+    expect(denied.body).toContain("Host header is not allowed");
+  });
+
+  it("still initializes Streamable HTTP when Host is the loopback bind", async () => {
+    const allowed = await postMcpWithHost(testPort, `${TEST_HOST}:${String(testPort)}`, {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "initialize",
+      params: initializeParams
+    });
+    expect(allowed.status).toBe(200);
+    const data = parseMcpPayload(allowed.contentType, allowed.body);
+    const serverInfo = (data.result as { serverInfo?: { name?: string; version?: string } })
+      ?.serverInfo;
+    expect(serverInfo?.name).toBe("sylphx-consultant-mcp");
+    expect(serverInfo?.version).toBe(packageJson.version);
+  });
+
   it("does not return wildcard CORS headers by default", async () => {
     const response = await fetch(baseUrl, {
       method: "OPTIONS",
@@ -292,6 +437,7 @@ describe("MCP Server HTTP Transport Authentication (Rust rmcp)", () => {
         ...process.env,
         NODE_ENV: "test",
         CONSULTANT_MOCK: "true",
+        CONSULTANT_MCP_RUST_BIN: stagedRustBin,
         MCP_TRANSPORT: "http",
         MCP_HTTP_PORT: testPort.toString(),
         MCP_HTTP_HOST: TEST_HOST,
