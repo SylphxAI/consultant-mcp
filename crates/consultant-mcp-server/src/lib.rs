@@ -11,7 +11,7 @@ use rmcp::{
     model::{CallToolResult, Implementation, ServerCapabilities, ServerInfo},
     tool, tool_handler, tool_router, ErrorData, ServerHandler,
 };
-use serde_json::Value;
+use serde_json::{Map, Value};
 use std::sync::Arc;
 
 pub const SERVER_NAME: &str = "sylphx-consultant-mcp";
@@ -46,14 +46,11 @@ impl ConsultantMcp {
         kind: ConsultationKind,
         args: Value,
     ) -> Result<CallToolResult, ErrorData> {
-        let request = ConsultationRequest::from_value(kind, args).map_err(|error| {
-            ErrorData::invalid_params(error, None)
-        })?;
-        let result = run_consultation(request, Arc::clone(&self.model_client), &self.config)
-            .await;
-        let structured = serde_json::to_value(result).map_err(|error| {
-            ErrorData::internal_error(error.to_string(), None)
-        })?;
+        let request = ConsultationRequest::from_value(kind, args)
+            .map_err(|error| ErrorData::invalid_params(error, None))?;
+        let result = run_consultation(request, Arc::clone(&self.model_client), &self.config).await;
+        let structured = serde_json::to_value(result)
+            .map_err(|error| ErrorData::internal_error(error.to_string(), None))?;
         Ok(CallToolResult::structured(structured))
     }
 }
@@ -66,9 +63,9 @@ impl ConsultantMcp {
     )]
     async fn consultant_review_decision(
         &self,
-        Parameters(args): Parameters<Value>,
+        Parameters(args): Parameters<Map<String, Value>>,
     ) -> Result<CallToolResult, ErrorData> {
-        self.consult_tool(ConsultationKind::ReviewDecision, args)
+        self.consult_tool(ConsultationKind::ReviewDecision, Value::Object(args))
             .await
     }
 
@@ -78,9 +75,10 @@ impl ConsultantMcp {
     )]
     async fn consultant_research(
         &self,
-        Parameters(args): Parameters<Value>,
+        Parameters(args): Parameters<Map<String, Value>>,
     ) -> Result<CallToolResult, ErrorData> {
-        self.consult_tool(ConsultationKind::Research, args).await
+        self.consult_tool(ConsultationKind::Research, Value::Object(args))
+            .await
     }
 
     #[tool(
@@ -89,9 +87,9 @@ impl ConsultantMcp {
     )]
     async fn consultant_challenge_answer(
         &self,
-        Parameters(args): Parameters<Value>,
+        Parameters(args): Parameters<Map<String, Value>>,
     ) -> Result<CallToolResult, ErrorData> {
-        self.consult_tool(ConsultationKind::ChallengeAnswer, args)
+        self.consult_tool(ConsultationKind::ChallengeAnswer, Value::Object(args))
             .await
     }
 
@@ -101,9 +99,9 @@ impl ConsultantMcp {
     )]
     async fn consultant_compare_options(
         &self,
-        Parameters(args): Parameters<Value>,
+        Parameters(args): Parameters<Map<String, Value>>,
     ) -> Result<CallToolResult, ErrorData> {
-        self.consult_tool(ConsultationKind::CompareOptions, args)
+        self.consult_tool(ConsultationKind::CompareOptions, Value::Object(args))
             .await
     }
 }
@@ -111,22 +109,15 @@ impl ConsultantMcp {
 #[tool_handler]
 impl ServerHandler for ConsultantMcp {
     fn get_info(&self) -> ServerInfo {
-        ServerInfo {
-            protocol_version: rmcp::model::ProtocolVersion::default(),
-            capabilities: ServerCapabilities::builder().enable_tools().build(),
-            server_info: Implementation {
-                name: SERVER_NAME.into(),
-                title: None,
-                version: SERVER_VERSION.into(),
-                description: Some(
-                    "Rust-native MCP server for consultant-mcp (modelcontextprotocol/rust-sdk rmcp)"
-                        .into(),
-                ),
-                icons: None,
-                website_url: Some("https://github.com/SylphxAI/consultant-mcp".into()),
-            },
-            instructions: Some(SERVER_INSTRUCTIONS.into()),
-        }
+        ServerInfo::new(ServerCapabilities::builder().enable_tools().build())
+            .with_server_info(
+                Implementation::new(SERVER_NAME, SERVER_VERSION)
+                    .with_description(
+                        "Rust-native MCP server for consultant-mcp (modelcontextprotocol/rust-sdk rmcp)",
+                    )
+                    .with_website_url("https://github.com/SylphxAI/consultant-mcp"),
+            )
+            .with_instructions(SERVER_INSTRUCTIONS)
     }
 }
 
@@ -148,10 +139,26 @@ mod tests {
     }
 
     #[test]
+    fn tool_input_schemas_are_json_objects() {
+        let tools = ConsultantMcp::new().tool_router.list_all();
+        for tool in tools {
+            assert_eq!(
+                tool.input_schema
+                    .get("type")
+                    .and_then(|value| value.as_str()),
+                Some("object"),
+                "{} inputSchema must be a JSON object for MCP",
+                tool.name
+            );
+        }
+    }
+
+    #[test]
     fn rust_http_transport_module_is_wired_for_web_mcp() {
         let src_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("src");
         let main_rs = fs::read_to_string(src_dir.join("main.rs")).expect("read main.rs");
-        let http_rs = fs::read_to_string(src_dir.join("http_transport.rs")).expect("read http_transport.rs");
+        let http_rs =
+            fs::read_to_string(src_dir.join("http_transport.rs")).expect("read http_transport.rs");
         assert!(main_rs.contains("http_transport::serve_http"));
         assert!(http_rs.contains("StreamableHttpService"));
         assert!(http_rs.contains("/mcp/health"));
@@ -161,8 +168,8 @@ mod tests {
     fn rust_stdio_transport_module_is_wired_for_default_mcp() {
         let src_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("src");
         let main_rs = fs::read_to_string(src_dir.join("main.rs")).expect("read main.rs");
-        let stdio_rs =
-            fs::read_to_string(src_dir.join("stdio_transport.rs")).expect("read stdio_transport.rs");
+        let stdio_rs = fs::read_to_string(src_dir.join("stdio_transport.rs"))
+            .expect("read stdio_transport.rs");
         assert!(main_rs.contains("stdio_transport::serve_stdio"));
         assert!(stdio_rs.contains("transport::stdio"));
         assert!(main_rs.contains("http_transport::transport_from_env"));
