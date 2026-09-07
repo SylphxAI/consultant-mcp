@@ -36,7 +36,7 @@ public surfaces.
 
 Product-specific consultation workflows, hosted service behavior, persistent
 usage ledgers, and organization policy live outside this package unless a future
-ADR changes the lifecycle and boundary.
+accepted design record changes the lifecycle and boundary.
 
 ## Public Surfaces
 
@@ -44,10 +44,10 @@ ADR changes the lifecycle and boundary.
 - CLI binary: `sylphx-consultant-mcp`
 - MCP tool schemas and Rust rmcp server: `src/schemas.ts`, `crates/consultant-mcp-server/`
 - Provider adapter boundary: `src/providers/`
-- Documentation and ADRs: `README.md`, `docs/`, `docs/adr/`, and `docs/specs/`
+- Documentation: `README.md`, `docs/`, and `docs/specs/`
 - SOTA family roadmap: `docs/roadmap/sota-family-roadmap.md`
 - CI/admission and GroundAtlas dogfood: `.github/workflows/ci.yml`
 
 ## Delivery
 
-Pull requests, merge groups, and main pushes run `.github/workflows/ci.yml`, including ADR-29 admission contexts, `bun run verify`, project-control boundary tests, and GroundAtlas package dogfooding. Package releases run through an already-versioned release PR plus `.github/workflows/release.yml`, npm provenance publish, install smoke, npm registry/readme readback, and GitHub release readback. Production proof for package changes is `bun run verify`, dry-run package verification, CI evidence, protected release workflow evidence, npm registry/readme readback, and GitHub release readback. Published package mistakes are recovered with forward fixes or replacement versions. Generated `.groundatlas*` files plus GroundAtlas JSON/Markdown reports are evidence/navigation only, not source of truth.
+Pull requests, merge groups, and main pushes run `.github/workflows/ci.yml`, including admission contexts, `bun run verify`, project-control boundary tests, and GroundAtlas package dogfooding. Package releases run through an already-versioned release PR plus `.github/workflows/release.yml`, npm provenance publish, install smoke, npm registry/readme readback, and GitHub release readback. Production proof for package changes is `bun run verify`, dry-run package verification, CI evidence, protected release workflow evidence, npm registry/readme readback, and GitHub release readback. Published package mistakes are recovered with forward fixes or replacement versions. Generated `.groundatlas*` files plus GroundAtlas JSON/Markdown reports are evidence/navigation only, not source of truth.
