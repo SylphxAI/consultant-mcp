@@ -63,16 +63,22 @@ jobs:
 
       - name: GroundAtlas package dogfood
         id: groundatlas
-        uses: SylphxAI/groundatlas@v0.1.3
-        with:
-          package-spec: groundatlas@0.1.3
-          output-dir: .groundatlas-pilot
-          require-atlas: "true"
-          strict: "true"
+        # Run the released GroundAtlas package through Bun instead of the
+        # composite action. The composite action shells out to `node` and
+        # `npm exec`, which this Bun-only job does not install, so it failed
+        # with `node: command not found` (exit 127). `--package groundatlas@0.1.3 ga`
+        # selects the `ga` bin without needing npm.
+        run: |
+          set -euo pipefail
+          bun x --bun --package groundatlas@0.1.3 ga update --out .groundatlas-pilot
+          bun x --bun --package groundatlas@0.1.3 ga manifest --out .groundatlas-pilot --json | tee "$RUNNER_TEMP/groundatlas-manifest.json"
+          bun x --bun --package groundatlas@0.1.3 ga audit --out .groundatlas-pilot
+          bun x --bun --package groundatlas@0.1.3 ga fleet . --out .groundatlas-pilot --require-atlas --strict --json | tee "$RUNNER_TEMP/groundatlas-fleet.json"
+          bun x --bun --package groundatlas@0.1.3 ga fleet . --out .groundatlas-pilot --require-atlas --strict | tee "$RUNNER_TEMP/groundatlas-fleet.md"
 
       - name: Assert GroundAtlas truth boundary
         run: |
-          bun - "${{ steps.groundatlas.outputs.manifest-report-path }}" "${{ steps.groundatlas.outputs.fleet-report-path }}" "${{ steps.groundatlas.outputs.fleet-markdown-report-path }}" <<'BUN'
+          bun - "$RUNNER_TEMP/groundatlas-manifest.json" "$RUNNER_TEMP/groundatlas-fleet.json" "$RUNNER_TEMP/groundatlas-fleet.md" <<'BUN'
           const [manifestPath, fleetPath, fleetMarkdownPath] = process.argv.slice(2);
           const { readFileSync } = require("node:fs");
           const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
@@ -101,9 +107,9 @@ jobs:
         with:
           name: groundatlas-package-dogfood
           path: |
-            ${{ steps.groundatlas.outputs.manifest-report-path }}
-            ${{ steps.groundatlas.outputs.fleet-report-path }}
-            ${{ steps.groundatlas.outputs.fleet-markdown-report-path }}
+            ${{ runner.temp }}/groundatlas-manifest.json
+            ${{ runner.temp }}/groundatlas-fleet.json
+            ${{ runner.temp }}/groundatlas-fleet.md
 
   trunk-admission:
     name: trunk-admission/pass
