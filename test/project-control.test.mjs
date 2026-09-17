@@ -56,11 +56,29 @@ test('CI verifies the package and dogfoods the released GroundAtlas package/acti
   assert.ok(workflow.includes('bun run build:rust'))
   assert.ok(workflow.includes('bun run verify'))
   assert.ok(workflow.includes('bun run test:project-control'))
-  assert.ok(workflow.includes('uses: SylphxAI/groundatlas@v0.1.3'))
-  assert.ok(workflow.includes('package-spec: groundatlas@0.1.3'))
-  assert.ok(workflow.includes('require-atlas: "true"'))
-  assert.ok(workflow.includes('strict: "true"'))
-  assert.ok(workflow.includes('fleet-markdown-report-path'))
+  // CI dogfoods the released GroundAtlas package through Bun (`--package` bin
+  // selection), not the node/npm-based composite action, which this Bun-only
+  // job cannot run.
+  assert.ok(
+    workflow.includes(
+      'bun x --bun --package groundatlas@0.1.3 ga update --out .groundatlas-pilot'
+    )
+  )
+  assert.ok(
+    workflow.includes(
+      'bun x --bun --package groundatlas@0.1.3 ga manifest --out .groundatlas-pilot --json'
+    )
+  )
+  assert.ok(
+    workflow.includes(
+      'bun x --bun --package groundatlas@0.1.3 ga audit --out .groundatlas-pilot'
+    )
+  )
+  assert.ok(
+    workflow.includes(
+      'bun x --bun --package groundatlas@0.1.3 ga fleet . --out .groundatlas-pilot --require-atlas --strict'
+    )
+  )
   assert.ok(workflow.includes('Summary: 1 adopted, 0 warning, 0 blocked, 1 total.'))
   assert.ok(workflow.includes('project.manifest.json'))
   assert.ok(workflow.includes('.doctrine/project.json'))

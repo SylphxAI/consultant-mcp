@@ -94,7 +94,7 @@
       },
       {
         "repo": "SylphxAI/groundatlas",
-        "surface": "GroundAtlas GitHub Action, npm package, schemas, and generated evidence reports.",
+        "surface": "GroundAtlas npm package (invoked via `bun x --bun --package groundatlas@0.1.3 ga ...` in CI and release workflows), schemas, and generated evidence reports.",
         "direction": "peer-public"
       },
       {
