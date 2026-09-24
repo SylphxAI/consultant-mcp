@@ -3,7 +3,7 @@
   "version": "0.2.2",
   "description": "Beta MCP server for typed SOTA consultation, model fan-out, and judge synthesis for autonomous agents.",
   "type": "module",
-  "packageManager": "bun@1.4.0",
+  "packageManager": "bun@1.4.2",
   "engines": {
     "bun": ">=1.4.0"
   },
