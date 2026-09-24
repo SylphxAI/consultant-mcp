@@ -20,7 +20,7 @@ permissions:
 jobs:
   map-and-stale:
     name: rust-parity-drift-pass/map-and-stale
-    runs-on: sylphx-linux-standard
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
       stale_capabilities: ${{ steps.map.outputs.stale }}
@@ -78,7 +78,7 @@ jobs:
     name: rust-parity-drift-pass/differential
     needs: map-and-stale
     # Prefer standard: sylphx-linux-large may have 0 online capacity.
-    runs-on: sylphx-linux-standard
+    runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
       # PR head (not merge commit) so proof binds to candidate branch tip.
@@ -169,7 +169,7 @@ jobs:
 
   rust-parity-drift-pass:
     name: rust-parity-drift-pass/pass
-    runs-on: sylphx-linux-standard
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     needs:
       - map-and-stale
