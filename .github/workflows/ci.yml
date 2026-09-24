@@ -14,7 +14,7 @@ permissions:
 jobs:
   risk-classification:
     name: risk-classification/pass
-    runs-on: sylphx-linux-standard
+    runs-on: ubuntu-latest  # summary gate: GitHub-hosted so a runner-fleet fault never blocks a merge
     steps:
       - uses: actions/checkout@v7
         with:
@@ -113,7 +113,7 @@ jobs:
 
   trunk-admission:
     name: trunk-admission/pass
-    runs-on: sylphx-linux-standard
+    runs-on: ubuntu-latest  # summary gate: GitHub-hosted so a runner-fleet fault never blocks a merge
     needs:
       - risk-classification
       - ci
@@ -128,7 +128,7 @@ jobs:
 
   postsubmit-proof:
     name: postsubmit-proof/pass
-    runs-on: sylphx-linux-standard
+    runs-on: ubuntu-latest  # summary gate: GitHub-hosted so a runner-fleet fault never blocks a merge
     needs:
       - risk-classification
       - ci
@@ -144,7 +144,7 @@ jobs:
 
   recovery-decision:
     name: recovery-decision/pass
-    runs-on: sylphx-linux-standard
+    runs-on: ubuntu-latest  # summary gate: GitHub-hosted so a runner-fleet fault never blocks a merge
     needs:
       - risk-classification
       - ci
