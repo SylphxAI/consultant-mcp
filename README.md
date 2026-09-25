@@ -1,5 +1,7 @@
 # Sylphx Consultant MCP
 
+> **Retired (2026-09-25).** Consultant MCP is no longer maintained and this repository is archived. The Sylphx open-source MCP tools are now [anymd](https://github.com/SylphxAI/citra) (any file → Markdown for agents) and [repomap](https://github.com/SylphxAI/spine) (a map of your codebase for agents).
+
 `@sylphx/consultant-mcp` is a **Beta 0.x** Model Context Protocol server that gives autonomous agents a typed, audited path to ask a higher-grade consultant panel for:
 
 - ADR / architecture / design review
